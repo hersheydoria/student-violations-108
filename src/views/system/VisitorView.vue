@@ -61,8 +61,8 @@ function handleEnterClick() {
         class="mt-4"
       >
         <template v-slot:append>
-          <v-btn @click="handleEnterClick" color="primary" icon>
-            <v-icon>mdi-keyboard-return</v-icon> <!-- Enter icon -->
+          <v-btn @click="handleEnterClick" color="primary">
+            Enter <!-- Display the word "Enter" -->
           </v-btn>
         </template>
       </v-text-field>
