@@ -21,7 +21,7 @@ const goToLogin = () => {
 
 // Student data (mock data for demonstration)
 const studentsData = [
-  { id: '221-00598', name: 'May Estroga', violations: 'None', dateRecorded: '2024-01-15' },
+  { id: '221-00598', name: 'May Estroga', violations: 'Dress Code', dateRecorded: '2024-10-15' },
   { id: '221-00599', name: 'Hershey Doria', violations: 'Late submission', dateRecorded: '2024-01-20' },
   { id: '221-00600', name: 'Rovannah Delola', violations: 'Absent', dateRecorded: '2024-02-05' },
 ];
@@ -83,19 +83,17 @@ watch(theme, (newTheme) => {
     </v-app-bar>
 
     <v-container>
-      <div class="text-center mt-4">
-        <p>Please enter your student ID number below.</p>
-      </div>
+    
 
       <!-- Simple description before the search bar, aligned left -->
-      <div class="mt-2">
-        <p class="text-start">Use the search bar to find your student records.</p>
+      <div class="mt-16">
+        <p class="text-start">Enter your student ID number </p>
       </div>
 
       <!-- Search bar for Student ID with Enter button inside -->
       <v-text-field
         v-model="studentID"
-        label="Enter your Student ID"
+        label="ID Number"
         clearable
         class="mt-4"
       >
@@ -106,22 +104,22 @@ watch(theme, (newTheme) => {
         </template>
       </v-text-field>
 
-      <!-- Display student records in a table -->
-      <v-table v-if="studentRecords.length > 0" class="mt-4">
+      <!-- Display student records in a table with softer borders -->
+      <v-table v-if="studentRecords.length > 0" class="mt-4" style="border: 1px solid #ccc; border-collapse: collapse;">
         <thead>
           <tr>
-            <th>Student ID</th>
-            <th>Name</th>
-            <th>Violations</th>
-            <th>Date Recorded</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Student ID</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Name</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Violations</th>
+            <th style="border: 1px solid #ddd; padding: 8px;">Date Recorded</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="record in studentRecords" :key="record.id">
-            <td>{{ record.id }}</td>
-            <td>{{ record.name }}</td>
-            <td>{{ record.violations }}</td>
-            <td>{{ record.dateRecorded }}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{{ record.id }}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{{ record.name }}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{{ record.violations }}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">{{ record.dateRecorded }}</td>
           </tr>
         </tbody>
       </v-table>
@@ -135,14 +133,21 @@ watch(theme, (newTheme) => {
       <v-card>
         <v-card-title>{{ selectedStudent?.name }}'s Record History</v-card-title>
         <v-card-text>
-          <v-list>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>Violation: {{ selectedStudent?.violations }}</v-list-item-title>
-                <v-list-item-subtitle>Date Recorded: {{ selectedStudent?.dateRecorded }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
+          <v-table style="border: 1px solid #ccc; border-collapse: collapse;">
+            <thead>
+              <tr>
+                <th style="border: 1px solid #ddd; padding: 8px;">Violation</th>
+                <th style="border: 1px solid #ddd; padding: 8px;">Date Recorded</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #ddd;">
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ selectedStudent?.violations }}</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">{{ selectedStudent?.dateRecorded }}</td>
+              </tr>
+              <!-- You can add more history records here if needed -->
+            </tbody>
+          </v-table>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
