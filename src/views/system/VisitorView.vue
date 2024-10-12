@@ -12,9 +12,9 @@ function onClick() {
 
 // Student data (mock data for demonstration)
 const studentsData = [
-  { id: '123', name: 'John Doe', violations: 'None', dateRecorded: '2024-01-15' },
-  { id: '456', name: 'Jane Smith', violations: 'Late submission', dateRecorded: '2024-01-20' },
-  { id: '789', name: 'Mark Johnson', violations: 'Absent', dateRecorded: '2024-02-05' },
+  { id: '221-00598', name: 'May Estroga', violations: 'Dress Code', dateRecorded: '2024-10-15' },
+  { id: '221-00599', name: 'Hershey Doria', violations: 'Late submission', dateRecorded: '2024-01-20' },
+  { id: '221-00600', name: 'Rovannah Delola', violations: 'Absent', dateRecorded: '2024-02-05' },
 ]
 
 const studentID = ref('') // The student's ID input
