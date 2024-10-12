@@ -10,16 +10,20 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      redirect: '/login',  // Default route redirects to login
+    },
+    {
+      path: '/login',      // Login route
       name: 'login',
       component: LoginView
     },
     {
-      path: '/visitor',
+      path: '/visitor',    // Visitor view route
       name: 'visitor',
       component: VisitorView
     },
     {
-      path: '/home',
+      path: '/home',       // Home view (Dashboard) route after login
       name: 'home',
       component: HomeView
     }

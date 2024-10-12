@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'; // Ensure 'watch' is imported
+import { ref, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Reactive variables
@@ -48,8 +48,8 @@ const addViolation = () => {
 
 // Logout method
 const logout = () => {
-  // Implement your logout logic here (clear user session, tokens, etc.)
-  router.push('/login'); // Redirect to login page
+  localStorage.removeItem('authToken'); // Clear any token or session data
+  router.push('/login'); // Redirect to login page after logout
 };
 
 // Theme toggle function
@@ -70,99 +70,77 @@ watch(theme, (newTheme) => {
 </script>
 
 <template>
-  <v-responsive class="border rounded">
-    <v-app :theme="theme">
-      <v-app-bar
-        class="px-3"
-        :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'"
-        border
-      >
-        <v-toolbar-title>Violation Management</v-toolbar-title>
-        <v-spacer></v-spacer>
+  <v-app :theme="theme">
+    <v-app-bar
+      class="px-3"
+      :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'"
+    >
+      <v-toolbar-title>Violation Management</v-toolbar-title>
+      <v-spacer></v-spacer>
 
-        <!-- Logout button -->
-        <v-btn text @click="logout">Logout</v-btn>
+      <!-- Logout button -->
+      <v-btn text @click="logout">Logout</v-btn>
 
-        <!-- Theme toggle button -->
-        <v-btn
-          :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-          variant="elevated"
-          slim
-          @click="onClick"
-        ></v-btn>
-      </v-app-bar>
+      <!-- Theme toggle button -->
+      <v-btn
+        :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+        variant="elevated"
+        slim
+        @click="onClick"
+      ></v-btn>
+    </v-app-bar>
 
-      <v-main>
-        <v-container>
-          <!-- Add Violation button -->
-          <v-btn @click="showForm = true" color="pink">Add Violation</v-btn>
+    <v-main>
+      <v-container>
+        <!-- Add Violation button -->
+        <v-btn @click="showForm = true" color="pink">Add Violation</v-btn>
 
-          <!-- Violations Table -->
-          <v-data-table
-            :headers="headers"
-            :items="violations"
-            class="violations-table"
-          >
-            <template v-slot:item="{ item }">
-              <tr>
-                <td>{{ item.studentId }}</td>
-                <td>{{ item.type }}</td>
-                <td>{{ item.date }}</td>
-                <td>{{ item.recordedBy }}</td>
-              </tr>
-            </template>
-          </v-data-table>
+        <!-- Violations Table -->
+        <v-data-table
+          :headers="headers"
+          :items="violations"
+        >
+          <template v-slot:item="{ item }">
+            <tr>
+              <td>{{ item.studentId }}</td>
+              <td>{{ item.type }}</td>
+              <td>{{ item.date }}</td>
+              <td>{{ item.recordedBy }}</td>
+            </tr>
+          </template>
+        </v-data-table>
 
-          <!-- Add Violation Modal -->
-          <v-dialog v-model="showForm" max-width="600px">
-            <v-card>
-              <v-card-title>Add Violation</v-card-title>
-              <v-card-text>
-                <v-text-field
-                  label="ID Number"
-                  v-model="newViolation.studentId"
-                  required
-                ></v-text-field>
-                <v-select
-                  label="Violation Type"
-                  v-model="newViolation.type"
-                  :items="violationTypes"
-                  required
-                ></v-select>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn @click="showForm = false" color="grey">Cancel</v-btn>
-                <v-btn @click="addViolation" color="pink">Add</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </v-container>
-      </v-main>
+        <!-- Add Violation Modal -->
+        <v-dialog v-model="showForm" max-width="600px">
+          <v-card>
+            <v-card-title>Add Violation</v-card-title>
+            <v-card-text>
+              <v-text-field
+                label="ID Number"
+                v-model="newViolation.studentId"
+                required
+              ></v-text-field>
+              <v-select
+                label="Violation Type"
+                v-model="newViolation.type"
+                :items="violationTypes"
+                required
+              ></v-select>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn @click="showForm = false" color="grey">Cancel</v-btn>
+              <v-btn @click="addViolation" color="pink">Add</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-container>
+    </v-main>
 
-      <!-- Footer with centered text -->
-      <v-footer app class="px-3" :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'">
-        <v-row>
-          <v-col class="text-center"> © 2024 - Student Violations </v-col>
-        </v-row>
-      </v-footer>
-    </v-app>
-  </v-responsive>
+    <v-footer app class="px-3" :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'">
+      <v-row>
+        <v-col class="text-center"> © 2024 - Student Violations </v-col>
+      </v-row>
+    </v-footer>
+  </v-app>
 </template>
-
-<style scoped>
-.violations-table {
-  margin-top: 20px;
-}
-
-/* Add styles for dark/light themes */
-[data-theme='dark'] {
-  background-color: #121212;
-  color: white;
-}
-
-[data-theme='light'] {
-  background-color: white;
-  color: black;
-}
-</style>
