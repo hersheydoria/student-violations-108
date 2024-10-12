@@ -15,9 +15,6 @@ function onClick() {
       <v-app-bar class="px-3">
         <v-spacer></v-spacer>
 
-        <!-- Button for visiting Visitor page -->
-        <v-btn text @click="goToVisitorPage">Visitor Page</v-btn>
-
         <v-btn
           :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
           text="Toggle Theme"
