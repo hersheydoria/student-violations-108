@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 // Theme setup
 const theme = ref(localStorage.getItem('theme') ?? 'Light')
@@ -33,15 +33,21 @@ function handleEnterClick() {
     studentRecords.value = [] // Reset records if no student found
   }
 }
+
+// Watch the studentID and clear records when input is cleared (X button clicked)
+watch(studentID, (newValue) => {
+  if (!newValue) {
+    studentRecords.value = [] // Clear the records when search input is empty
+  }
+})
 </script>
 
 <template>
   <v-app :theme="theme">
     <v-app-bar class="px-3"
-    :color="theme === 'light' ? 'green-lighten-1' : 'green-darken-3'"
-    border
+      :color="theme === 'light' ? 'green-lighten-1' : 'green-darken-3'"
+      border
     >
-
       <v-spacer></v-spacer>
       <v-btn
         :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
@@ -94,9 +100,9 @@ function handleEnterClick() {
 
     <!-- Footer with centered text -->
     <v-footer app class="px-3" :color="theme === 'light' ? 'green-lighten-1' : 'green-darken-3'">
-        <v-row>
-          <v-col class="text-center"> © 2024 - Student Violations </v-col>
-        </v-row>
-      </v-footer>
+      <v-row>
+        <v-col class="text-center">© 2024 - Student Violations</v-col>
+      </v-row>
+    </v-footer>
   </v-app>
 </template>
