@@ -48,18 +48,28 @@ watch(studentID, (newValue) => {
       :color="theme === 'light' ? 'green-lighten-1' : 'green-darken-3'"
       border
     >
-      <v-spacer></v-spacer>
-      <v-btn
-        :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-        text="Toggle Theme"
-        slim
-        @click="onClick"
-      ></v-btn>
+      <!-- Align Visitor Page text and Toggle Theme button in the same row -->
+      <v-row align="center" class="flex-grow-1">
+        <!-- Visitor Page text -->
+        <v-col class="text-start">
+          <h1>Visitor Page</h1>
+        </v-col>
+
+        <!-- Spacer to push Toggle Theme button to the right -->
+        <v-spacer></v-spacer>
+
+        <!-- Toggle Theme button -->
+        <v-btn
+          :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+          text="Toggle Theme"
+          slim
+          @click="onClick"
+        ></v-btn>
+      </v-row>
     </v-app-bar>
 
     <v-container>
-      <div class="text-center mt-16">
-        <h1>Visitor Page</h1>
+      <div class="text-center mt-4">
         <p>Please enter your student ID number below.</p>
       </div>
 
