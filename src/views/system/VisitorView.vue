@@ -37,7 +37,9 @@ function handleEnterClick() {
 
 <template>
   <v-app :theme="theme">
-    <v-app-bar class="px-3">
+    <v-app-bar class="px-3"
+      >
+
       <v-spacer></v-spacer>
       <v-btn
         :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
@@ -87,5 +89,12 @@ function handleEnterClick() {
         </tbody>
       </v-table>
     </v-container>
+
+    <!-- Footer with centered text -->
+    <v-footer app class="px-3" :color="theme === 'light' ? 'green-lighten-1' : 'green-darken-3'">
+        <v-row>
+          <v-col class="text-center"> © 2024 - Student Violations </v-col>
+        </v-row>
+      </v-footer>
   </v-app>
 </template>
