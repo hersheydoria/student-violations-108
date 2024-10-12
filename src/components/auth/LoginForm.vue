@@ -73,13 +73,6 @@ function onResetPassword() {
     <!-- Use v-row to layout the Login button and Forgot Password link -->
     <v-row>
       <v-col class="text-left">
-        <v-btn color="primary" @click="onLogin">Login</v-btn>
-      </v-col>
-
-      <!-- Add a spacer to push the Forgot Password link to the right -->
-      <v-spacer></v-spacer>
-
-      <v-col class="text-right">
         <span
           text
           @click="onForgotPassword"
@@ -87,6 +80,11 @@ function onResetPassword() {
         >
           Forgot Password?
         </span>
+      </v-col>
+      <!-- Add a spacer to push the Forgot Password link to the right -->
+      <v-spacer></v-spacer>
+      <v-col class="text-right">
+        <v-btn color="primary" @click="onLogin">Login</v-btn>
       </v-col>
     </v-row>
 
