@@ -1,76 +1,77 @@
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router' // Import the Vue Router
+import { ref, onMounted, watch } from 'vue';
+import { useRouter } from 'vue-router'; // Import the Vue Router
 
 // Theme setup
-const theme = ref(localStorage.getItem('theme') ?? 'Light')
+const theme = ref(localStorage.getItem('theme') ?? 'light');
 
-// Function to toggle theme
-function onClick() {
-  theme.value = theme.value === 'light' ? 'dark' : 'light'
-  localStorage.setItem('theme', theme.value)
-}
+// Theme toggle function
+const onClick = () => {
+  theme.value = theme.value === 'light' ? 'dark' : 'light';
+  localStorage.setItem('theme', theme.value);
+};
 
 // Router setup to navigate to login page
-const router = useRouter()
+const router = useRouter();
 
 // Function to handle Log In button click
-function goToLogin() {
-  router.push('/login') // Assuming '/login' is the route for your login page
-}
+const goToLogin = () => {
+  router.push('/login'); // Assuming '/login' is the route for your login page
+};
 
 // Student data (mock data for demonstration)
 const studentsData = [
   { id: '221-00598', name: 'May Estroga', violations: 'None', dateRecorded: '2024-01-15' },
   { id: '221-00599', name: 'Hershey Doria', violations: 'Late submission', dateRecorded: '2024-01-20' },
   { id: '221-00600', name: 'Rovannah Delola', violations: 'Absent', dateRecorded: '2024-02-05' },
-]
+];
 
-const studentID = ref('') // The student's ID input
-const studentRecords = ref([]) // To store records for the student
+const studentID = ref(''); // The student's ID input
+const studentRecords = ref([]); // To store records for the student
 
 // Function to handle ID input when Enter button is clicked
 function handleEnterClick() {
   // Find the student by ID
-  const student = studentsData.find(s => s.id === studentID.value)
+  const student = studentsData.find(s => s.id === studentID.value);
   if (student) {
     // Store the student's records
     studentRecords.value = [
       { id: student.id, name: student.name, violations: student.violations, dateRecorded: student.dateRecorded }
-    ]
+    ];
   } else {
-    studentRecords.value = [] // Reset records if no student found
+    studentRecords.value = []; // Reset records if no student found
   }
 }
+
+// Set theme on mounted
+onMounted(() => {
+  document.body.setAttribute('data-theme', theme.value);
+});
+
+// Watch for theme changes
+watch(theme, (newTheme) => {
+  document.body.setAttribute('data-theme', newTheme);
+});
 </script>
 
 <template>
   <v-app :theme="theme">
-    <v-app-bar class="px-3"
-      :color="theme === 'light' ? 'green-lighten-1' : 'green-darken-3'"
-      border
-    >
-      <!-- Align Visitor Page text, Log In button, and Toggle Theme button in the same row -->
-      <v-row align="center" class="flex-grow-1">
-        <!-- Visitor Page text -->
-        <v-col class="text-start">
-          <h1>Visitor Page</h1>
-        </v-col>
+    <v-app-bar class="px-3" :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'">
+      <!-- Updated Header -->
+      <v-toolbar-title>Visitor Page</v-toolbar-title>
 
-        <!-- Spacer to push buttons to the right -->
-        <v-spacer></v-spacer>
+      <v-spacer></v-spacer> <!-- Spacer to push buttons to the right -->
 
-        <!-- Log In button -->
-        <v-btn text @click="goToLogin">Log In</v-btn>
+      <!-- Log In button -->
+      <v-btn text @click="goToLogin">Log In</v-btn>
 
-         <!-- Theme toggle button -->
-         <v-btn
-          :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-          variant="elevated"
-          slim
-          @click="onClick"
-        ></v-btn>
-      </v-row>
+      <!-- Theme toggle button -->
+      <v-btn
+        :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+        variant="elevated"
+        slim
+        @click="onClick"
+      ></v-btn>
     </v-app-bar>
 
     <v-container>
@@ -114,11 +115,10 @@ function handleEnterClick() {
     </v-container>
 
     <!-- Footer with centered text -->
-    <v-footer app class="px-3" :color="theme === 'light' ? 'green-lighten-1' : 'green-darken-3'">
+    <v-footer app class="px-3" :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'">
       <v-row>
         <v-col class="text-center">© 2024 - Student Violations</v-col>
       </v-row>
     </v-footer>
   </v-app>
 </template>
-
