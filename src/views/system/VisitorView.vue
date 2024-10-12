@@ -38,7 +38,9 @@ function handleEnterClick() {
 <template>
   <v-app :theme="theme">
     <v-app-bar class="px-3"
-      >
+    :color="theme === 'light' ? 'green-lighten-1' : 'green-darken-3'"
+    border
+    >
 
       <v-spacer></v-spacer>
       <v-btn
