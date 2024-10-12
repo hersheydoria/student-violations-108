@@ -12,28 +12,25 @@ function onClick() {
 
 // Student data (mock data for demonstration)
 const studentsData = [
-  { id: '221-00598', name: 'May Estroga', violations: 'Dress Code', dateRecorded: '2024-10-15' },
+  { id: '221-00598', name: 'May Estroga', violations: 'None', dateRecorded: '2024-01-15' },
   { id: '221-00599', name: 'Hershey Doria', violations: 'Late submission', dateRecorded: '2024-01-20' },
   { id: '221-00600', name: 'Rovannah Delola', violations: 'Absent', dateRecorded: '2024-02-05' },
 ]
 
 const studentID = ref('') // The student's ID input
-const studentInfo = ref(null) // To store student details based on input
 const studentRecords = ref([]) // To store records for the student
 
-// Function to handle ID input
-function handleIDInput() {
+// Function to handle ID input when Enter button is clicked
+function handleEnterClick() {
   // Find the student by ID
   const student = studentsData.find(s => s.id === studentID.value)
   if (student) {
-    studentInfo.value = student.name
-    // Here, you would fetch actual records related to the student
+    // Store the student's records
     studentRecords.value = [
       { id: student.id, name: student.name, violations: student.violations, dateRecorded: student.dateRecorded }
     ]
   } else {
-    studentInfo.value = null // Reset if no student found
-    studentRecords.value = [] // Reset records
+    studentRecords.value = [] // Reset records if no student found
   }
 }
 </script>
@@ -56,19 +53,19 @@ function handleIDInput() {
         <p>Please enter your student ID number below.</p>
       </div>
 
-      <!-- Search bar for Student ID -->
+      <!-- Search bar for Student ID with Enter button inside -->
       <v-text-field
         v-model="studentID"
         label="Enter your Student ID"
-        @input="handleIDInput"
         clearable
         class="mt-4"
-      ></v-text-field>
-
-      <!-- Display student name if found -->
-      <div v-if="studentInfo" class="mt-4">
-        <p>Welcome, student: {{ studentInfo }}</p>
-      </div>
+      >
+        <template v-slot:append>
+          <v-btn @click="handleEnterClick" color="primary" icon>
+            <v-icon>mdi-keyboard-return</v-icon> <!-- Enter icon -->
+          </v-btn>
+        </template>
+      </v-text-field>
 
       <!-- Display student records in a table -->
       <v-table v-if="studentRecords.length > 0" class="mt-4">
