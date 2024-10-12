@@ -75,7 +75,7 @@ watch(theme, (newTheme) => {
       class="px-3"
       :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'"
     >
-      <v-toolbar-title>Violation Management</v-toolbar-title>
+      <v-toolbar-title>Student Violation Management</v-toolbar-title>
       <v-spacer></v-spacer>
 
       <!-- Logout button -->
@@ -99,16 +99,9 @@ watch(theme, (newTheme) => {
         <v-data-table
           :headers="headers"
           :items="violations"
-        >
-          <template v-slot:item="{ item }">
-            <tr>
-              <td>{{ item.studentId }}</td>
-              <td>{{ item.type }}</td>
-              <td>{{ item.date }}</td>
-              <td>{{ item.recordedBy }}</td>
-            </tr>
-          </template>
-        </v-data-table>
+          item-value="id"
+          class="mt-5"
+        ></v-data-table>
 
         <!-- Add Violation Modal -->
         <v-dialog v-model="showForm" max-width="600px">
