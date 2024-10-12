@@ -61,9 +61,7 @@ function handleEnterClick() {
         <v-spacer></v-spacer>
 
         <!-- Log In button -->
-        <v-btn color="primary" @click="goToLogin">
-          Log In
-        </v-btn>
+        <v-btn text @click="goToLogin">Log In</v-btn>
 
          <!-- Theme toggle button -->
          <v-btn
