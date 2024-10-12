@@ -28,6 +28,8 @@ const studentsData = [
 
 const studentID = ref(''); // The student's ID input
 const studentRecords = ref([]); // To store records for the student
+const historyModalVisible = ref(false); // Control visibility of the history modal
+const selectedStudent = ref(null); // To store the selected student
 
 // Function to handle ID input when Enter button is clicked
 function handleEnterClick() {
@@ -41,6 +43,12 @@ function handleEnterClick() {
   } else {
     studentRecords.value = []; // Reset records if no student found
   }
+}
+
+// Function to open the history modal
+function showHistory(record) {
+  selectedStudent.value = record; // Set selected student record
+  historyModalVisible.value = true; // Show the modal
 }
 
 // Set theme on mounted
@@ -79,6 +87,11 @@ watch(theme, (newTheme) => {
         <p>Please enter your student ID number below.</p>
       </div>
 
+      <!-- Simple description before the search bar, aligned left -->
+      <div class="mt-2">
+        <p class="text-start">Use the search bar to find your student records.</p>
+      </div>
+
       <!-- Search bar for Student ID with Enter button inside -->
       <v-text-field
         v-model="studentID"
@@ -112,7 +125,31 @@ watch(theme, (newTheme) => {
           </tr>
         </tbody>
       </v-table>
+
+      <!-- View History Button Below the Table -->
+      <v-btn v-if="studentRecords.length > 0" @click="showHistory(studentRecords[0])" color="blue" class="mt-4">View History</v-btn>
     </v-container>
+
+    <!-- History Modal -->
+    <v-dialog v-model="historyModalVisible" max-width="600px">
+      <v-card>
+        <v-card-title>{{ selectedStudent?.name }}'s Record History</v-card-title>
+        <v-card-text>
+          <v-list>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Violation: {{ selectedStudent?.violations }}</v-list-item-title>
+                <v-list-item-subtitle>Date Recorded: {{ selectedStudent?.dateRecorded }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="historyModalVisible = false" color="grey">Close</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
     <!-- Footer with centered text -->
     <v-footer app class="px-3" :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'">
