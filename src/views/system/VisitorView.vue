@@ -1,5 +1,6 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router' // Import the Vue Router
 
 // Theme setup
 const theme = ref(localStorage.getItem('theme') ?? 'Light')
@@ -8,6 +9,14 @@ const theme = ref(localStorage.getItem('theme') ?? 'Light')
 function onClick() {
   theme.value = theme.value === 'light' ? 'dark' : 'light'
   localStorage.setItem('theme', theme.value)
+}
+
+// Router setup to navigate to login page
+const router = useRouter()
+
+// Function to handle Log In button click
+function goToLogin() {
+  router.push('/login') // Assuming '/login' is the route for your login page
 }
 
 // Student data (mock data for demonstration)
@@ -33,13 +42,6 @@ function handleEnterClick() {
     studentRecords.value = [] // Reset records if no student found
   }
 }
-
-// Watch the studentID and clear records when input is cleared (X button clicked)
-watch(studentID, (newValue) => {
-  if (!newValue) {
-    studentRecords.value = [] // Clear the records when search input is empty
-  }
-})
 </script>
 
 <template>
@@ -48,15 +50,20 @@ watch(studentID, (newValue) => {
       :color="theme === 'light' ? 'green-lighten-1' : 'green-darken-3'"
       border
     >
-      <!-- Align Visitor Page text and Toggle Theme button in the same row -->
+      <!-- Align Visitor Page text, Log In button, and Toggle Theme button in the same row -->
       <v-row align="center" class="flex-grow-1">
         <!-- Visitor Page text -->
         <v-col class="text-start">
           <h1>Visitor Page</h1>
         </v-col>
 
-        <!-- Spacer to push Toggle Theme button to the right -->
+        <!-- Spacer to push buttons to the right -->
         <v-spacer></v-spacer>
+
+        <!-- Log In button -->
+        <v-btn color="primary" @click="goToLogin">
+          Log In
+        </v-btn>
 
         <!-- Toggle Theme button -->
         <v-btn
@@ -116,3 +123,4 @@ watch(studentID, (newValue) => {
     </v-footer>
   </v-app>
 </template>
+
