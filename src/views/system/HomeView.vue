@@ -46,6 +46,15 @@ const addViolation = () => {
   showForm.value = false;
 };
 
+// Navigation methods
+const goToHome = () => {
+  router.push('/home'); // Assuming you have a home route
+};
+
+const goToHistory = () => {
+  router.push('/history'); // Assuming you have a history route
+};
+
 // Logout method
 const logout = () => {
   localStorage.removeItem('authToken'); // Clear any token or session data
@@ -78,6 +87,12 @@ watch(theme, (newTheme) => {
       <v-toolbar-title>Student Violation Management</v-toolbar-title>
       <v-spacer></v-spacer>
 
+      <!-- Home button -->
+      <v-btn text @click="goToHome">Home</v-btn>
+
+      <!-- History button -->
+      <v-btn text @click="goToHistory">History</v-btn>
+
       <!-- Logout button -->
       <v-btn text @click="logout">Logout</v-btn>
 
@@ -92,16 +107,34 @@ watch(theme, (newTheme) => {
 
     <v-main>
       <v-container>
-        <!-- Add Violation button -->
-        <v-btn @click="showForm = true" color="pink">Add Violation</v-btn>
+        <v-row>
+          <!-- Profile section -->
+          <v-col cols="3">
+            <v-card outlined>
+              <v-card-text>
+                <div><strong>Profile Pic</strong></div>
+                <p><strong>ID Number:</strong> 123456</p>
+                <p><strong>Name:</strong> John Doe</p>
+                <p><strong>Email:</strong> johndoe@example.com</p>
+                <p><strong>Role:</strong> Student</p>
+              </v-card-text>
+            </v-card>
+          </v-col>
 
-        <!-- Violations Table -->
-        <v-data-table
-          :headers="headers"
-          :items="violations"
-          item-value="id"
-          class="mt-5"
-        ></v-data-table>
+          <!-- Main section with Add button and Table -->
+          <v-col cols="9">
+            <!-- Add Violation button -->
+            <v-btn @click="showForm = true" color="pink">Add Violation</v-btn>
+
+            <!-- Violations Table -->
+            <v-data-table
+              :headers="headers"
+              :items="violations"
+              item-value="id"
+              class="mt-5"
+            ></v-data-table>
+          </v-col>
+        </v-row>
 
         <!-- Add Violation Modal -->
         <v-dialog v-model="showForm" max-width="600px">
@@ -130,6 +163,7 @@ watch(theme, (newTheme) => {
       </v-container>
     </v-main>
 
+    <!-- Footer left untouched as requested -->
     <v-footer app class="px-3" :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'">
       <v-row>
         <v-col class="text-center"> © 2024 - Student Violations </v-col>
