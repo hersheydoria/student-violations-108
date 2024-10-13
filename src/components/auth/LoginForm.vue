@@ -69,6 +69,19 @@ function onResetPassword() {
       type="password"
       required
     ></v-text-field>
+    <!-- Add message below the form -->
+    <v-alert type="info" color="customGreen" text class="mt-4 mb-4">
+      <strong>Note:</strong> Only guards registered in the organization or school can sign in.
+      Students should go to the
+      <strong>
+        <router-link
+          to="/visitor"
+          style="text-decoration: underline; color: inherit; cursor: pointer"
+        >
+          Visitor Page
+        </router-link> </strong
+      >.
+    </v-alert>
 
     <!-- Use v-row to layout the Login button and Forgot Password link -->
     <v-row>
@@ -84,7 +97,7 @@ function onResetPassword() {
       <!-- Add a spacer to push the Forgot Password link to the right -->
       <v-spacer></v-spacer>
       <v-col class="text-right">
-        <v-btn color="primary" @click="onLogin">Login</v-btn>
+        <v-btn color="customGreen" @click="onLogin">Login</v-btn>
       </v-col>
     </v-row>
 
