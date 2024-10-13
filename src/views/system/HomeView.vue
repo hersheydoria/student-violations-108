@@ -6,6 +6,8 @@ import { useRouter } from 'vue-router'
 // Reactive variables
 const router = useRouter()
 const showForm = ref(false)
+const showLeftSidebar = ref(false) // Reactive variable for left sidebar
+const showRightSidebar = ref(false) // Reactive variable for right sidebar
 const newViolation = ref({
   studentId: '',
   type: ''
@@ -73,45 +75,92 @@ const showHistory = () => {
 const showStatus = () => {
   showViewStatus.value = true // Show status modal
 }
+
+// Toggle Left Sidebar
+const toggleLeftSidebar = () => {
+  showLeftSidebar.value = !showLeftSidebar.value
+}
+
+// Toggle Right Sidebar
+const toggleRightSidebar = () => {
+  showRightSidebar.value = !showRightSidebar.value
+}
 </script>
 
 <template>
   <v-app>
     <AppLayout>
       <v-app-bar class="px-3" :color="'green lighten-1'">
+        <!-- Hamburger Menu for Navigation -->
+        <v-btn icon @click="toggleLeftSidebar">
+          <v-icon>mdi-menu</v-icon>
+        </v-btn>
+        
         <v-toolbar-title>Student Violation Management</v-toolbar-title>
         <v-spacer></v-spacer>
-
-        <!-- Hamburger Menu for Navigation -->
-        <v-menu offset-y>
-          <template #activator="{ props }">
-            <v-btn v-bind="props" icon>
-              <v-icon>mdi-menu</v-icon>
-            </v-btn>
-          </template>
-          <v-list>
-            <v-list-item class="text-center">
-              <v-avatar size="100" class="mx-auto">
-                <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
-              </v-avatar>
-            </v-list-item>
-            <v-list-item>
-              <p><strong>ID Number:</strong></p>
-            </v-list-item>
-            <v-list-item>
-              <p><strong>Name:</strong></p>
-            </v-list-item>
-            <v-list-item>
-              <p><strong>Email:</strong></p>
-            </v-list-item>
-            <v-list-item>
-              <p><strong>Role:</strong></p>
-            </v-list-item>
-            <v-divider></v-divider>
-            <v-list-item @click="logout">Logout</v-list-item>
-          </v-list>
-        </v-menu>
+        
+       
       </v-app-bar>
+
+      <!-- Left Sidebar -->
+      <v-navigation-drawer
+        v-model="showLeftSidebar"
+        temporary
+        app
+        left
+      >
+        <v-list>
+          <v-list-item class="text-center">
+            <v-avatar size="100" class="mx-auto">
+              <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
+            </v-avatar>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>ID Number:</strong></p>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>Name:</strong></p>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>Email:</strong></p>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>Role:</strong></p>
+          </v-list-item>
+          <v-divider></v-divider>
+          <v-list-item @click="logout">Logout</v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+
+      <!-- Right Sidebar (if needed) -->
+      <v-navigation-drawer
+        v-model="showRightSidebar"
+        temporary
+        app
+        right
+      >
+        <v-list>
+          <v-list-item class="text-center">
+            <v-avatar size="100" class="mx-auto">
+              <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
+            </v-avatar>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>ID Number:</strong></p>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>Name:</strong></p>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>Email:</strong></p>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>Role:</strong></p>
+          </v-list-item>
+          <v-divider></v-divider>
+          <v-list-item @click="logout">Logout</v-list-item>
+        </v-list>
+      </v-navigation-drawer>
 
       <v-main>
         <v-container fluid>
