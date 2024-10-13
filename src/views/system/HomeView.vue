@@ -86,8 +86,7 @@ const toggleLeftSidebar = () => {
 <template>
   <v-app>
     <AppLayout>
-      <v-app-bar class="px-3" :color="'green lighten-1'">
-        <!-- Hamburger Menu for Navigation -->
+      <v-app-bar class="px-3" color="green lighten-1">
         <v-btn icon @click="toggleLeftSidebar">
           <v-icon>mdi-menu</v-icon>
         </v-btn>
@@ -99,9 +98,10 @@ const toggleLeftSidebar = () => {
       <!-- Left Sidebar -->
       <v-navigation-drawer
         v-model="showLeftSidebar"
-        temporary
         app
-        left
+        :mini-variant.sync="showLeftSidebar"
+        width="256"
+        mini-width="56"
       >
         <v-list>
           <v-list-item class="text-center">
@@ -160,18 +160,14 @@ const toggleLeftSidebar = () => {
         <v-container fluid>
           <v-row>
             <v-col cols="12" class="d-flex align-center justify-space-between">
-              <!-- Add Violation button -->
               <v-btn @click="showForm = true" color="blue">Add Violation</v-btn>
-              <!-- View History button -->
               <v-btn class="ml-5" @click="showHistory" color="green">View History</v-btn>
-              <!-- View Status button -->
               <v-btn class="ml-5" @click="showStatus" color="orange">View Status</v-btn>
             </v-col>
           </v-row>
 
           <v-row>
             <v-col cols="12">
-              <!-- Violations Table with labeled headers -->
               <v-data-table
                 :headers="headers"
                 :items="violations"
@@ -233,7 +229,6 @@ const toggleLeftSidebar = () => {
             <v-card>
               <v-card-title>View History</v-card-title>
               <v-card-text>
-                <!-- Place your history information here -->
                 <p>This is where the history would be displayed.</p>
               </v-card-text>
               <v-card-actions>
@@ -252,9 +247,7 @@ const toggleLeftSidebar = () => {
                   <v-list-item-group>
                     <v-list-item v-for="student in students" :key="student.id">
                       <v-list-item-content>
-                        <v-list-item-title
-                          >{{ student.name }} (ID: {{ student.id }})</v-list-item-title
-                        >
+                        <v-list-item-title>{{ student.name }} (ID: {{ student.id }})</v-list-item-title>
                         <v-list-item-subtitle>Status: {{ student.status }}</v-list-item-subtitle>
                       </v-list-item-content>
                     </v-list-item>
