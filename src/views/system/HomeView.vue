@@ -101,6 +101,7 @@ const toggleLeftSidebar = () => {
         app
         width="256"
         mini-width="56"
+        color="green"
       >
         <v-list>
           <v-list-item class="text-center">
@@ -173,7 +174,7 @@ const toggleLeftSidebar = () => {
                   </v-toolbar>
                 </template>
                 <template v-slot:item.action="{ item }">
-                  <v-btn @click="unblockViolation(item.id)" color="pink">UNBLOCK</v-btn>
+                  <v-btn @click="unblockViolation(item.id)" color="green">UNBLOCK</v-btn>
                 </template>
               </v-data-table>
 
