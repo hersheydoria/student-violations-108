@@ -148,7 +148,7 @@ const toggleLeftSidebar = () => {
         <v-container fluid>
           <v-row>
             <v-col cols="12" class="d-flex align-center justify-space-between">
-              <v-btn @click="showForm = true" color="blue">Add Violation</v-btn>
+              <v-btn @click="showForm = true" color="green">Add Violation</v-btn>
             </v-col>
           </v-row>
 
@@ -186,10 +186,10 @@ const toggleLeftSidebar = () => {
               <!-- Align buttons to the right at the bottom of the table -->
               <v-row class="justify-end mt-3">
                 <v-col cols="auto">
-                  <v-btn @click="showHistory" color="blue">View History</v-btn>
+                  <v-btn @click="showHistory" color="green">View History</v-btn>
                 </v-col>
                 <v-col cols="auto">
-                  <v-btn @click="showStatus" color="blue">View Blocked Students</v-btn>
+                  <v-btn @click="showStatus" color="green">View Blocked Students</v-btn>
                 </v-col>
               </v-row>
             </v-col>
