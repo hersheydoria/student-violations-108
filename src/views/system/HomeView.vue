@@ -12,14 +12,15 @@ const newViolation = ref({
   studentId: '',
   type: ''
 })
-const violations = ref([]) // Your existing violation data
+const violations = ref([]) // Current violation data
+const history = ref([]) // History of violations
 const headers = [
   { text: 'Student ID', value: 'studentId' },
   { text: 'Violation Type', value: 'type' },
   { text: 'Date', value: 'date' },
   { text: 'Recorded By', value: 'recordedBy' },
-  { text: 'Status', value: 'status' }, // New Status column
-  { text: 'Action', value: 'action', sortable: false } // New Action column for buttons
+  { text: 'Status', value: 'status' },
+  { text: 'Action', value: 'action', sortable: false }
 ]
 const violationTypes = [
   'Dress Code Violation',
@@ -56,9 +57,12 @@ const addViolation = () => {
 
 // Method to unblock a violation
 const unblockViolation = (violationId) => {
-  const violation = violations.value.find(v => v.id === violationId);
-  if (violation) {
-    violation.status = 'Unblocked'; // Change status to 'Unblocked'
+  const index = violations.value.findIndex(v => v.id === violationId);
+  if (index !== -1) {
+    const unblockedViolation = violations.value[index];
+    unblockedViolation.status = 'Unblocked'; // Change status to 'Unblocked'
+    history.value.push(unblockedViolation); // Add to history
+    violations.value.splice(index, 1); // Remove from current violations
   }
 }
 
@@ -169,7 +173,7 @@ const toggleLeftSidebar = () => {
                   </v-toolbar>
                 </template>
                 <template v-slot:item.action="{ item }">
-                  <v-btn @click="unblockViolation(item.id)" color="green">UNBLOCK</v-btn>
+                  <v-btn @click="unblockViolation(item.id)" color="pink">UNBLOCK</v-btn>
                 </template>
               </v-data-table>
 
@@ -212,7 +216,19 @@ const toggleLeftSidebar = () => {
             <v-card>
               <v-card-title>History</v-card-title>
               <v-card-text>
-                <p>This is where the history would be displayed.</p>
+                <v-data-table
+                  :headers="headers"
+                  :items="history"
+                  item-value="id"
+                  class="mt-5"
+                  :footer-props="{ 'items-per-page-options': [] }"
+                >
+                  <template #top>
+                    <v-toolbar flat>
+                      <v-toolbar-title>Violation History</v-toolbar-title>
+                    </v-toolbar>
+                  </template>
+                </v-data-table>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
