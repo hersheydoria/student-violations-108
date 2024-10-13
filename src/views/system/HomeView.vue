@@ -89,7 +89,7 @@ const toggleLeftSidebar = () => {
         <v-btn icon @click="toggleLeftSidebar">
           <v-icon>mdi-menu</v-icon>
         </v-btn>
-        
+
         <v-toolbar-title>Student Violation System</v-toolbar-title>
         <v-spacer></v-spacer>
       </v-app-bar>
@@ -98,7 +98,7 @@ const toggleLeftSidebar = () => {
       <v-navigation-drawer
         v-model="showLeftSidebar"
         app
-        :mini-variant.sync="showLeftSidebar"
+        v-model:mini-variant="showLeftSidebar"
         width="256"
         mini-width="56"
       >
@@ -126,12 +126,7 @@ const toggleLeftSidebar = () => {
       </v-navigation-drawer>
 
       <!-- Right Sidebar (if needed) -->
-      <v-navigation-drawer
-        v-model="showRightSidebar"
-        temporary
-        app
-        right
-      >
+      <v-navigation-drawer v-model="showRightSidebar" temporary app right>
         <v-list>
           <v-list-item class="text-center">
             <v-avatar size="100" class="mx-auto">
@@ -254,7 +249,9 @@ const toggleLeftSidebar = () => {
                   <v-list-item-group>
                     <v-list-item v-for="student in students" :key="student.id">
                       <v-list-item-content>
-                        <v-list-item-title>{{ student.name }} (ID: {{ student.id }})</v-list-item-title>
+                        <v-list-item-title
+                          >{{ student.name }} (ID: {{ student.id }})</v-list-item-title
+                        >
                         <v-list-item-subtitle>Status: {{ student.status }}</v-list-item-subtitle>
                       </v-list-item-content>
                     </v-list-item>
