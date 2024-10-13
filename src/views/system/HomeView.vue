@@ -34,7 +34,14 @@ const violationTypes = [
 // State variables for modals
 const showViewHistory = ref(false);
 const showViewStatus = ref(false);
-const status = ref('Blocked'); // Example status, change accordingly
+
+// Sample student data with their status
+const students = ref([
+  { id: '123456', name: 'John Doe', status: 'Blocked' },
+  { id: '789012', name: 'Jane Smith', status: 'Unblocked' },
+  { id: '345678', name: 'Alice Johnson', status: 'Blocked' },
+  { id: '901234', name: 'Bob Brown', status: 'Unblocked' },
+]);
 
 // Methods
 const addViolation = () => {
@@ -56,14 +63,14 @@ const logout = () => {
   router.push('/login'); // Redirect to login page after logout
 };
 
-// Method to show status
-const showStatus = () => {
-  showViewStatus.value = true; // Show status modal
-};
-
 // Method to show history
 const showHistory = () => {
   showViewHistory.value = true; // Show history modal
+};
+
+// Method to show status
+const showStatus = () => {
+  showViewStatus.value = true; // Show status modal
 };
 </script>
 
@@ -196,7 +203,16 @@ const showHistory = () => {
           <v-card>
             <v-card-title>View Status</v-card-title>
             <v-card-text>
-              <p>Your current status is: <strong>{{ status }}</strong></p>
+              <v-list>
+                <v-list-item-group>
+                  <v-list-item v-for="student in students" :key="student.id">
+                    <v-list-item-content>
+                      <v-list-item-title>{{ student.name }} (ID: {{ student.id }})</v-list-item-title>
+                      <v-list-item-subtitle>Status: {{ student.status }}</v-list-item-subtitle>
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>
