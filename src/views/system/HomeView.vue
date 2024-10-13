@@ -113,10 +113,10 @@ watch(theme, (newTheme) => {
             <v-card outlined>
               <v-card-text>
                 <div><strong>Profile Pic</strong></div>
-                <p><strong>ID Number:</strong> 123456</p>
-                <p><strong>Name:</strong> John Doe</p>
-                <p><strong>Email:</strong> johndoe@example.com</p>
-                <p><strong>Role:</strong> Student</p>
+                <p><strong>ID Number:</strong></p>
+                <p><strong>Name:</strong></p>
+                <p><strong>Email:</strong></p>
+                <p><strong>Role:</strong></p>
               </v-card-text>
             </v-card>
           </v-col>
@@ -126,12 +126,13 @@ watch(theme, (newTheme) => {
             <!-- Add Violation button -->
             <v-btn @click="showForm = true" color="pink">Add Violation</v-btn>
 
-            <!-- Violations Table -->
+            <!-- Violations Table without pagination or items per page controls -->
             <v-data-table
               :headers="headers"
               :items="violations"
               item-value="id"
               class="mt-5"
+              :footer-props="{ 'items-per-page-options': [] }"
             ></v-data-table>
           </v-col>
         </v-row>
