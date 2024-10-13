@@ -91,7 +91,7 @@ const toggleLeftSidebar = () => {
           <v-icon>mdi-menu</v-icon>
         </v-btn>
         
-        <v-toolbar-title>Student Violation Management</v-toolbar-title>
+        <v-toolbar-title>Student Violation System</v-toolbar-title>
         <v-spacer></v-spacer>
       </v-app-bar>
 
