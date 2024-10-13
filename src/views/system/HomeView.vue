@@ -6,8 +6,8 @@ import { useRouter } from 'vue-router'
 // Reactive variables
 const router = useRouter()
 const showForm = ref(false)
-const showLeftSidebar = ref(false) // Reactive variable for left sidebar
-const showRightSidebar = ref(false) // Reactive variable for right sidebar
+const showLeftSidebar = ref(false)
+const showRightSidebar = ref(false)
 const newViolation = ref({
   studentId: '',
   type: ''
@@ -36,8 +36,6 @@ const violationTypes = [
 
 // State variables for modals
 const showViewHistory = ref(false)
-const showViewStatus = ref(false)
-
 
 
 // Methods
@@ -65,10 +63,6 @@ const showHistory = () => {
   showViewHistory.value = true // Show history modal
 }
 
-// Method to show status
-const showStatus = () => {
-  showViewStatus.value = true // Show status modal
-}
 
 // Toggle Left Sidebar
 const toggleLeftSidebar = () => {
@@ -92,7 +86,6 @@ const toggleLeftSidebar = () => {
       <v-navigation-drawer
         v-model="showLeftSidebar"
         app
-        v-model:mini-variant="showLeftSidebar"
         width="256"
         mini-width="56"
       >
@@ -166,21 +159,6 @@ const toggleLeftSidebar = () => {
                     <v-toolbar-title>Violation Records</v-toolbar-title>
                   </v-toolbar>
                 </template>
-
-                <template #item="{ item }">
-                  <v-row>
-                    <v-col cols="12">
-                      <v-card class="mb-2">
-                        <v-card-text>
-                          <strong>Student ID:</strong> {{ item.studentId }} <br />
-                          <strong>Violation Type:</strong> {{ item.type }} <br />
-                          <strong>Date:</strong> {{ item.date }} <br />
-                          <strong>Recorded By:</strong> {{ item.recordedBy }} <br />
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                  </v-row>
-                </template>
               </v-data-table>
 
               <!-- Align buttons to the right at the bottom of the table -->
@@ -188,9 +166,7 @@ const toggleLeftSidebar = () => {
                 <v-col cols="auto">
                   <v-btn @click="showHistory" color="green">View History</v-btn>
                 </v-col>
-                <v-col cols="auto">
-                  <v-btn @click="showStatus" color="green">View Blocked Students</v-btn>
-                </v-col>
+          
               </v-row>
             </v-col>
           </v-row>
@@ -234,19 +210,7 @@ const toggleLeftSidebar = () => {
             </v-card>
           </v-dialog>
 
-          <!-- View Status Modal -->
-          <v-dialog v-model="showViewStatus" max-width="600px">
-            <v-card>
-              <v-card-title>Blocked Students</v-card-title>
-              <v-card-text>
-                <p>This is where the blocked students would be displayed.</p>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn @click="showViewStatus = false" color="grey">Close</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+  
         </v-container>
       </v-main>
     </AppLayout>
