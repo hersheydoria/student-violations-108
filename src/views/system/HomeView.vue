@@ -186,10 +186,10 @@ const toggleLeftSidebar = () => {
               <!-- Align buttons to the right at the bottom of the table -->
               <v-row class="justify-end mt-3">
                 <v-col cols="auto">
-                  <v-btn @click="showHistory" color="green">View History</v-btn>
+                  <v-btn @click="showHistory" color="blue">View History</v-btn>
                 </v-col>
                 <v-col cols="auto">
-                  <v-btn @click="showStatus" color="orange">View Status</v-btn>
+                  <v-btn @click="showStatus" color="blue">View Blocked Students</v-btn>
                 </v-col>
               </v-row>
             </v-col>
@@ -237,9 +237,9 @@ const toggleLeftSidebar = () => {
           <!-- View Status Modal -->
           <v-dialog v-model="showViewStatus" max-width="600px">
             <v-card>
-              <v-card-title>View Status</v-card-title>
+              <v-card-title>View Blocked Students</v-card-title>
               <v-card-text>
-                <p>This is where the status would be displayed, if it is BLOCKED or UNBLOCKED.</p>
+                <p>This is where the blocked students would be displayed.</p>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
