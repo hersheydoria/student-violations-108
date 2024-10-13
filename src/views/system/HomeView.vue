@@ -17,7 +17,9 @@ const headers = [
   { text: 'Student ID', value: 'studentId' },
   { text: 'Violation Type', value: 'type' },
   { text: 'Date', value: 'date' },
-  { text: 'Recorded By', value: 'recordedBy' }
+  { text: 'Recorded By', value: 'recordedBy' },
+  { text: 'Status', value: 'status' }, // New Status column
+  { text: 'Action', value: 'action', sortable: false } // New Action column for buttons
 ]
 const violationTypes = [
   'Dress Code Violation',
@@ -37,7 +39,6 @@ const violationTypes = [
 // State variables for modals
 const showViewHistory = ref(false)
 
-
 // Methods
 const addViolation = () => {
   violations.value.push({
@@ -45,11 +46,20 @@ const addViolation = () => {
     studentId: newViolation.value.studentId,
     type: newViolation.value.type,
     date: new Date().toLocaleDateString(), // Add current date
-    recordedBy: 'Guard' // Example recordedBy, adjust as needed
+    recordedBy: 'Guard', // Example recordedBy, adjust as needed
+    status: 'Blocked' // Initial status
   })
   newViolation.value.studentId = ''
   newViolation.value.type = ''
   showForm.value = false
+}
+
+// Method to unblock a violation
+const unblockViolation = (violationId) => {
+  const violation = violations.value.find(v => v.id === violationId);
+  if (violation) {
+    violation.status = 'Unblocked'; // Change status to 'Unblocked'
+  }
 }
 
 // Logout method
@@ -62,7 +72,6 @@ const logout = () => {
 const showHistory = () => {
   showViewHistory.value = true // Show history modal
 }
-
 
 // Toggle Left Sidebar
 const toggleLeftSidebar = () => {
@@ -159,6 +168,9 @@ const toggleLeftSidebar = () => {
                     <v-toolbar-title>Violation Records</v-toolbar-title>
                   </v-toolbar>
                 </template>
+                <template v-slot:item.action="{ item }">
+                  <v-btn @click="unblockViolation(item.id)" color="green">UNBLOCK</v-btn>
+                </template>
               </v-data-table>
 
               <!-- Align buttons to the right at the bottom of the table -->
@@ -166,7 +178,6 @@ const toggleLeftSidebar = () => {
                 <v-col cols="auto">
                   <v-btn @click="showHistory" color="green">View History</v-btn>
                 </v-col>
-          
               </v-row>
             </v-col>
           </v-row>
@@ -210,7 +221,6 @@ const toggleLeftSidebar = () => {
             </v-card>
           </v-dialog>
 
-  
         </v-container>
       </v-main>
     </AppLayout>
