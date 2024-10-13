@@ -124,7 +124,7 @@ watch(theme, (newTheme) => {
           <!-- Main section with Add button and Table -->
           <v-col cols="9">
             <!-- Add Violation button -->
-            <v-btn @click="showForm = true" color="pink">Add Violation</v-btn>
+            <v-btn @click="showForm = true" color="blue">Add Violation</v-btn>
 
             <!-- Violations Table without pagination or items per page controls -->
             <v-data-table
