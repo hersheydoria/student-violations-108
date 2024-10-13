@@ -81,10 +81,6 @@ const toggleLeftSidebar = () => {
   showLeftSidebar.value = !showLeftSidebar.value
 }
 
-// Toggle Right Sidebar
-const toggleRightSidebar = () => {
-  showRightSidebar.value = !showRightSidebar.value
-}
 </script>
 
 <template>
