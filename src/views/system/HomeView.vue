@@ -1,10 +1,9 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 // Reactive variables
 const router = useRouter();
-const theme = ref(localStorage.getItem('theme') ?? 'light');
 const showForm = ref(false);
 const newViolation = ref({
   studentId: '',
@@ -32,6 +31,11 @@ const violationTypes = [
   'None Wearing ID',
 ];
 
+// State variables for modals
+const showViewHistory = ref(false);
+const showViewStatus = ref(false);
+const status = ref('Blocked'); // Example status, change accordingly
+
 // Methods
 const addViolation = () => {
   violations.value.push({
@@ -46,94 +50,104 @@ const addViolation = () => {
   showForm.value = false;
 };
 
-// Navigation methods
-const goToHome = () => {
-  router.push('/home'); // Assuming you have a home route
-};
-
-const goToHistory = () => {
-  router.push('/history'); // Assuming you have a history route
-};
-
 // Logout method
 const logout = () => {
   localStorage.removeItem('authToken'); // Clear any token or session data
   router.push('/login'); // Redirect to login page after logout
 };
 
-// Theme toggle function
-const onClick = () => {
-  theme.value = theme.value === 'light' ? 'dark' : 'light';
-  localStorage.setItem('theme', theme.value);
+// Method to show status
+const showStatus = () => {
+  showViewStatus.value = true; // Show status modal
 };
 
-// Set theme on mounted
-onMounted(() => {
-  document.body.setAttribute('data-theme', theme.value);
-});
-
-// Watch for theme changes
-watch(theme, (newTheme) => {
-  document.body.setAttribute('data-theme', newTheme);
-});
+// Method to show history
+const showHistory = () => {
+  showViewHistory.value = true; // Show history modal
+};
 </script>
 
 <template>
-  <v-app :theme="theme">
-    <v-app-bar
-      class="px-3"
-      :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'"
-    >
+  <v-app>
+    <v-app-bar class="px-3" :color="'green lighten-1'">
       <v-toolbar-title>Student Violation Management</v-toolbar-title>
       <v-spacer></v-spacer>
 
-      <!-- Home button -->
-      <v-btn text @click="goToHome">Home</v-btn>
-
-      <!-- History button -->
-      <v-btn text @click="goToHistory">History</v-btn>
-
-      <!-- Logout button -->
-      <v-btn text @click="logout">Logout</v-btn>
-
-      <!-- Theme toggle button -->
-      <v-btn
-        :prepend-icon="theme === 'light' ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-        variant="elevated"
-        slim
-        @click="onClick"
-      ></v-btn>
+      <!-- Hamburger Menu for Navigation -->
+      <v-menu offset-y>
+        <template #activator="{ props }">
+          <v-btn v-bind="props" icon>
+            <v-icon>mdi-menu</v-icon>
+          </v-btn>
+        </template>
+        <v-list>
+          <v-list-item class="text-center">
+            <v-avatar size="100" class="mx-auto">
+              <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
+            </v-avatar>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>ID Number:</strong></p>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>Name:</strong></p>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>Email:</strong></p>
+          </v-list-item>
+          <v-list-item>
+            <p><strong>Role:</strong></p>
+          </v-list-item>
+          <v-divider></v-divider>
+          <v-list-item @click="logout">Logout</v-list-item>
+        </v-list>
+      </v-menu>
     </v-app-bar>
 
     <v-main>
-      <v-container>
+      <v-container fluid>
         <v-row>
-          <!-- Profile section -->
-          <v-col cols="3">
-            <v-card outlined>
-              <v-card-text>
-                <div><strong>Profile Pic</strong></div>
-                <p><strong>ID Number:</strong></p>
-                <p><strong>Name:</strong></p>
-                <p><strong>Email:</strong></p>
-                <p><strong>Role:</strong></p>
-              </v-card-text>
-            </v-card>
-          </v-col>
-
-          <!-- Main section with Add button and Table -->
-          <v-col cols="9">
+          <v-col cols="12" class="d-flex align-center justify-space-between">
             <!-- Add Violation button -->
             <v-btn @click="showForm = true" color="blue">Add Violation</v-btn>
+            <!-- View History button -->
+            <v-btn class="ml-5" @click="showHistory" color="green">View History</v-btn>
+            <!-- View Status button -->
+            <v-btn class="ml-5" @click="showStatus" color="orange">View Status</v-btn>
+          </v-col>
+        </v-row>
 
-            <!-- Violations Table without pagination or items per page controls -->
+        <v-row>
+          <v-col cols="12">
+            <!-- Violations Table with labeled headers -->
             <v-data-table
               :headers="headers"
               :items="violations"
               item-value="id"
               class="mt-5"
               :footer-props="{ 'items-per-page-options': [] }"
-            ></v-data-table>
+            >
+              <template #top>
+                <v-toolbar flat>
+                  <v-toolbar-title>Violation Records</v-toolbar-title>
+                </v-toolbar>
+              </template>
+
+              <template #item="{ item }">
+                <v-row>
+                  <v-col cols="12">
+                    <v-card class="mb-2">
+                      <v-card-text>
+                        <strong>Student ID:</strong> {{ item.studentId }} <br />
+                        <strong>Violation Type:</strong> {{ item.type }} <br />
+                        <strong>Date:</strong> {{ item.date }} <br />
+                        <strong>Recorded By:</strong> {{ item.recordedBy }} <br />
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+              </template>
+            </v-data-table>
           </v-col>
         </v-row>
 
@@ -161,11 +175,41 @@ watch(theme, (newTheme) => {
             </v-card-actions>
           </v-card>
         </v-dialog>
+
+        <!-- View History Modal -->
+        <v-dialog v-model="showViewHistory" max-width="600px">
+          <v-card>
+            <v-card-title>View History</v-card-title>
+            <v-card-text>
+              <!-- Place your history information here -->
+              <p>This is where the history would be displayed.</p>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn @click="showViewHistory = false" color="grey">Close</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
+        <!-- View Status Modal -->
+        <v-dialog v-model="showViewStatus" max-width="600px">
+          <v-card>
+            <v-card-title>View Status</v-card-title>
+            <v-card-text>
+              <p>Your current status is: <strong>{{ status }}</strong></p>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn @click="showViewStatus = false" color="grey">Close</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+
       </v-container>
     </v-main>
 
     <!-- Footer left untouched as requested -->
-    <v-footer app class="px-3" :color="theme === 'light' ? 'green lighten-1' : 'green darken-3'">
+    <v-footer app class="px-3" :color="'green lighten-1'">
       <v-row>
         <v-col class="text-center"> © 2024 - Student Violations </v-col>
       </v-row>
