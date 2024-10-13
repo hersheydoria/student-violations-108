@@ -223,7 +223,7 @@ const toggleLeftSidebar = () => {
           <!-- View History Modal -->
           <v-dialog v-model="showViewHistory" max-width="600px">
             <v-card>
-              <v-card-title>View History</v-card-title>
+              <v-card-title>History</v-card-title>
               <v-card-text>
                 <p>This is where the history would be displayed.</p>
               </v-card-text>
@@ -237,7 +237,7 @@ const toggleLeftSidebar = () => {
           <!-- View Status Modal -->
           <v-dialog v-model="showViewStatus" max-width="600px">
             <v-card>
-              <v-card-title>View Blocked Students</v-card-title>
+              <v-card-title>Blocked Students</v-card-title>
               <v-card-text>
                 <p>This is where the blocked students would be displayed.</p>
               </v-card-text>
