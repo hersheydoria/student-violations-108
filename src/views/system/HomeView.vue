@@ -80,7 +80,6 @@ const showStatus = () => {
 const toggleLeftSidebar = () => {
   showLeftSidebar.value = !showLeftSidebar.value
 }
-
 </script>
 
 <template>
@@ -161,8 +160,6 @@ const toggleLeftSidebar = () => {
           <v-row>
             <v-col cols="12" class="d-flex align-center justify-space-between">
               <v-btn @click="showForm = true" color="blue">Add Violation</v-btn>
-              <v-btn class="ml-5" @click="showHistory" color="green">View History</v-btn>
-              <v-btn class="ml-5" @click="showStatus" color="orange">View Status</v-btn>
             </v-col>
           </v-row>
 
@@ -196,6 +193,16 @@ const toggleLeftSidebar = () => {
                   </v-row>
                 </template>
               </v-data-table>
+
+              <!-- Align buttons to the right at the bottom of the table -->
+              <v-row class="justify-end mt-3">
+                <v-col cols="auto">
+                  <v-btn @click="showHistory" color="green">View History</v-btn>
+                </v-col>
+                <v-col cols="auto">
+                  <v-btn @click="showStatus" color="orange">View Status</v-btn>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
 
