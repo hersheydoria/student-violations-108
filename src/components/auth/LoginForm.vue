@@ -102,9 +102,19 @@ function onResetPassword() {
     </v-row>
 
     <!-- Forgot Password Modal -->
-    <v-dialog v-model="forgotPasswordDialog" max-width="500">
-      <v-card>
-        <v-card-title class="headline">Reset Password</v-card-title>
+    <v-dialog
+      v-model="forgotPasswordDialog"
+      max-width="500"
+      elevation="10"
+      style="backdrop-filter: blur(8px)"
+    >
+      <v-card
+        class="px-6 py-6"
+        elevation="12"
+        rounded="xl"
+        style="background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px)"
+      >
+        <v-card-title class="headline"><strong>Reset Password</strong></v-card-title>
         <v-card-text>
           <!-- New password input fields in the modal -->
           <v-form v-model="valid" lazy-validation>
@@ -129,7 +139,7 @@ function onResetPassword() {
 
         <v-card-actions>
           <v-btn text @click="forgotPasswordDialog = false">Cancel</v-btn>
-          <v-btn color="primary" @click="onResetPassword">Reset Password</v-btn>
+          <v-btn color="customGreen" @click="onResetPassword">Reset Password</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
