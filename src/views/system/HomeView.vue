@@ -22,7 +22,7 @@ const headers = [
   { text: 'Action', value: 'action', sortable: false }
 ]
 const violationTypes = [
-  'Dress Code Violation',
+  'Dress Code',
   'Disruption Obstruction',
   'Gambling',
   'Bribery Receiving Bribe',
