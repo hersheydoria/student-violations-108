@@ -111,7 +111,13 @@ async function onResetPassword() {
       <!-- Add a spacer to push the Forgot Password link to the right -->
       <v-spacer></v-spacer>
       <v-col class="text-right">
-        <v-btn color="customGreen" @click="onLogin">Login</v-btn>
+        <v-btn
+          color="customGreen"
+          @click="onLogin"
+          style="width: 90px; height: 40px; font-size: 18px"
+        >
+          Login
+        </v-btn>
       </v-col>
     </v-row>
 

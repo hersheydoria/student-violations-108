@@ -12,7 +12,7 @@
   </v-container>
 
   <!-- Footer with centered text -->
-  <v-footer app class="px-3" style="background-color: #3a986a; color: white">
+  <v-footer app class="px-3" style="background-color: #e6ffb1; color: black">
     <v-row>
       <v-col class="text-center"> © 2024 - Student Violations </v-col>
     </v-row>
