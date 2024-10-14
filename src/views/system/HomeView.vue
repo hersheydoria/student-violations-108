@@ -86,7 +86,7 @@ const toggleLeftSidebar = () => {
 <template>
   <v-app>
     <AppLayout>
-      <v-app-bar class="px-3" color="green lighten-1">
+      <v-app-bar class="px-3" style="background-color: #e6ffb1">
         <v-btn icon @click="toggleLeftSidebar">
           <v-icon>mdi-menu</v-icon>
         </v-btn>
@@ -101,7 +101,7 @@ const toggleLeftSidebar = () => {
         app
         width="256"
         mini-width="56"
-        color="green"
+        style="color: #006400"
       >
         <v-list>
           <v-list-item class="text-center">
@@ -155,7 +155,7 @@ const toggleLeftSidebar = () => {
         <v-container fluid>
           <v-row>
             <v-col cols="12" class="d-flex align-center justify-space-between">
-              <v-btn @click="showForm = true" color="green">Add Violation</v-btn>
+              <v-btn @click="showForm = true" color="#286643" style="color: white; border: 2px solid #E6FFB1;">Add Violation</v-btn>
             </v-col>
           </v-row>
 
@@ -181,7 +181,7 @@ const toggleLeftSidebar = () => {
               <!-- Align buttons to the right at the bottom of the table -->
               <v-row class="justify-end mt-3">
                 <v-col cols="auto">
-                  <v-btn @click="showHistory" color="green">View History</v-btn>
+                  <v-btn @click="showHistory" color="#286643" style="color: white; border: 2px solid #E6FFB1;">View History</v-btn>
                 </v-col>
               </v-row>
             </v-col>
