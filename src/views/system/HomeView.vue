@@ -6,18 +6,21 @@ import { useRouter } from 'vue-router'
 // Reactive variables
 const router = useRouter()
 const showForm = ref(false)
-const showLeftSidebar = ref(false) // Reactive variable for left sidebar
-const showRightSidebar = ref(false) // Reactive variable for right sidebar
+const showLeftSidebar = ref(false)
+const showRightSidebar = ref(false)
 const newViolation = ref({
   studentId: '',
   type: ''
 })
-const violations = ref([]) // Your existing violation data
+const violations = ref([]) // Current violation data
+const history = ref([]) // History of violations
 const headers = [
   { text: 'Student ID', value: 'studentId' },
   { text: 'Violation Type', value: 'type' },
   { text: 'Date', value: 'date' },
-  { text: 'Recorded By', value: 'recordedBy' }
+  { text: 'Recorded By', value: 'recordedBy' },
+  { text: 'Status', value: 'status' },
+  { text: 'Action', value: 'action', sortable: false }
 ]
 const violationTypes = [
   'Dress Code Violation',
@@ -36,15 +39,6 @@ const violationTypes = [
 
 // State variables for modals
 const showViewHistory = ref(false)
-const showViewStatus = ref(false)
-
-// Sample student data with their status
-const students = ref([
-  { id: '123456', name: 'John Doe', status: 'Blocked' },
-  { id: '789012', name: 'Jane Smith', status: 'Unblocked' },
-  { id: '345678', name: 'Alice Johnson', status: 'Blocked' },
-  { id: '901234', name: 'Bob Brown', status: 'Unblocked' }
-])
 
 // Methods
 const addViolation = () => {
@@ -53,11 +47,23 @@ const addViolation = () => {
     studentId: newViolation.value.studentId,
     type: newViolation.value.type,
     date: new Date().toLocaleDateString(), // Add current date
-    recordedBy: 'Guard' // Example recordedBy, adjust as needed
+    recordedBy: 'Guard', // Example recordedBy, adjust as needed
+    status: 'Blocked' // Initial status
   })
   newViolation.value.studentId = ''
   newViolation.value.type = ''
   showForm.value = false
+}
+
+// Method to unblock a violation
+const unblockViolation = (violationId) => {
+  const index = violations.value.findIndex(v => v.id === violationId);
+  if (index !== -1) {
+    const unblockedViolation = violations.value[index];
+    unblockedViolation.status = 'Unblocked'; // Change status to 'Unblocked'
+    history.value.push(unblockedViolation); // Add to history
+    violations.value.splice(index, 1); // Remove from current violations
+  }
 }
 
 // Logout method
@@ -69,11 +75,6 @@ const logout = () => {
 // Method to show history
 const showHistory = () => {
   showViewHistory.value = true // Show history modal
-}
-
-// Method to show status
-const showStatus = () => {
-  showViewStatus.value = true // Show status modal
 }
 
 // Toggle Left Sidebar
@@ -98,13 +99,13 @@ const toggleLeftSidebar = () => {
       <v-navigation-drawer
         v-model="showLeftSidebar"
         app
-        v-model:mini-variant="showLeftSidebar"
         width="256"
         mini-width="56"
+        color="green"
       >
         <v-list>
           <v-list-item class="text-center">
-            <v-avatar size="100" class="mx-auto">
+            <v-avatar size="150" class="mx-auto"> <!-- Increased profile picture size -->
               <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
             </v-avatar>
           </v-list-item>
@@ -129,7 +130,7 @@ const toggleLeftSidebar = () => {
       <v-navigation-drawer v-model="showRightSidebar" temporary app right>
         <v-list>
           <v-list-item class="text-center">
-            <v-avatar size="100" class="mx-auto">
+            <v-avatar size="120" class="mx-auto"> <!-- Increased profile picture size -->
               <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
             </v-avatar>
           </v-list-item>
@@ -154,9 +155,7 @@ const toggleLeftSidebar = () => {
         <v-container fluid>
           <v-row>
             <v-col cols="12" class="d-flex align-center justify-space-between">
-              <v-btn @click="showForm = true" color="blue">Add Violation</v-btn>
-              <v-btn class="ml-5" @click="showHistory" color="green">View History</v-btn>
-              <v-btn class="ml-5" @click="showStatus" color="orange">View Status</v-btn>
+              <v-btn @click="showForm = true" color="green">Add Violation</v-btn>
             </v-col>
           </v-row>
 
@@ -174,22 +173,17 @@ const toggleLeftSidebar = () => {
                     <v-toolbar-title>Violation Records</v-toolbar-title>
                   </v-toolbar>
                 </template>
-
-                <template #item="{ item }">
-                  <v-row>
-                    <v-col cols="12">
-                      <v-card class="mb-2">
-                        <v-card-text>
-                          <strong>Student ID:</strong> {{ item.studentId }} <br />
-                          <strong>Violation Type:</strong> {{ item.type }} <br />
-                          <strong>Date:</strong> {{ item.date }} <br />
-                          <strong>Recorded By:</strong> {{ item.recordedBy }} <br />
-                        </v-card-text>
-                      </v-card>
-                    </v-col>
-                  </v-row>
+                <template v-slot:item.action="{ item }">
+                  <v-btn @click="unblockViolation(item.id)" color="green">UNBLOCK</v-btn>
                 </template>
               </v-data-table>
+
+              <!-- Align buttons to the right at the bottom of the table -->
+              <v-row class="justify-end mt-3">
+                <v-col cols="auto">
+                  <v-btn @click="showHistory" color="green">View History</v-btn>
+                </v-col>
+              </v-row>
             </v-col>
           </v-row>
 
@@ -221,9 +215,21 @@ const toggleLeftSidebar = () => {
           <!-- View History Modal -->
           <v-dialog v-model="showViewHistory" max-width="600px">
             <v-card>
-              <v-card-title>View History</v-card-title>
+              <v-card-title>History</v-card-title>
               <v-card-text>
-                <p>This is where the history would be displayed.</p>
+                <v-data-table
+                  :headers="headers"
+                  :items="history"
+                  item-value="id"
+                  class="mt-5"
+                  :footer-props="{ 'items-per-page-options': [] }"
+                >
+                  <template #top>
+                    <v-toolbar flat>
+                      <v-toolbar-title>Violation History</v-toolbar-title>
+                    </v-toolbar>
+                  </template>
+                </v-data-table>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -232,30 +238,6 @@ const toggleLeftSidebar = () => {
             </v-card>
           </v-dialog>
 
-          <!-- View Status Modal -->
-          <v-dialog v-model="showViewStatus" max-width="600px">
-            <v-card>
-              <v-card-title>View Status</v-card-title>
-              <v-card-text>
-                <v-list>
-                  <v-list-item-group>
-                    <v-list-item v-for="student in students" :key="student.id">
-                      <v-list-item-content>
-                        <v-list-item-title
-                          >{{ student.name }} (ID: {{ student.id }})</v-list-item-title
-                        >
-                        <v-list-item-subtitle>Status: {{ student.status }}</v-list-item-subtitle>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </v-list-item-group>
-                </v-list>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn @click="showViewStatus = false" color="grey">Close</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
         </v-container>
       </v-main>
     </AppLayout>
