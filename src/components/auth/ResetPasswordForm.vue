@@ -1,3 +1,59 @@
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+//import { supabase } from './supabase' // Uncomment and use Supabase properly in your setup
+
+const route = useRoute()
+const router = useRouter()
+
+// Form data
+const newPassword = ref('')
+const confirmPassword = ref('')
+const valid = ref(true)
+const resetToken = ref('')
+
+const passwordRules = {
+  required: (value) => !!value || 'Required.',
+  passwordMin: (v) => v.length >= 6 || 'Password must be at least 6 characters long',
+  passwordMatch: (v) => v === newPassword.value || 'Passwords must match'
+}
+
+// Alerts for success/error messages
+const errorMessage = ref('')
+const passwordResetSuccess = ref(false)
+
+// Get the reset token from the URL when the page is loaded
+onMounted(() => {
+  resetToken.value = route.query.access_token
+  if (!resetToken.value) {
+    // If there's no token, redirect back to login
+    router.push('/login')
+  }
+})
+
+// Reset password logic
+async function onSetNewPassword() {
+  if (valid.value) {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword.value
+      })
+
+      if (error) {
+        errorMessage.value = 'Error resetting password. Please try again.'
+        console.error('Error resetting password:', error)
+      } else {
+        passwordResetSuccess.value = true
+        router.push('/login')
+      }
+    } catch (err) {
+      errorMessage.value = 'An unexpected error occurred. Please try again.'
+      console.error('Unexpected error:', err)
+    }
+  }
+}
+</script>
+
 <template>
   <!-- Card Title -->
   <v-card-title class="headline text-center">
