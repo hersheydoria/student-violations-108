@@ -58,7 +58,7 @@ function showHistory(record) {
           style="color: white;"
         >
           <template v-slot:append>
-            <v-btn @click="handleEnterClick" color="#37b477" style="color: black;">
+            <v-btn @click="handleEnterClick" color="#286643" style="color: #e6ffb1; border: 2px solid #E6FFB1;">
               Enter
             </v-btn>
           </template>
@@ -92,9 +92,9 @@ function showHistory(record) {
         <v-btn
           v-if="studentRecords.length > 0"
           @click="showHistory(studentRecords[0])"
-          color="#37b477"
+          color="#286643"
           class="mt-4"
-          style="color: black;"
+          style="color: #E6FFB1; border: 2px solid #E6FFB1;"
         >
           View History
         </v-btn>
