@@ -64,25 +64,31 @@ function showHistory(record) {
           </template>
         </v-text-field>
 
-        <v-table v-if="studentRecords.length > 0" class="mt-4">
+        <!-- Transparent table for student records -->
+        <v-table
+          v-if="studentRecords.length > 0"
+          class="mt-4"
+          style="background-color: rgba(0, 0, 0, 0); color: white;"
+        >
           <thead>
             <tr>
-              <th style="color: white;">Student ID</th>
-              <th style="color: white;">Name</th>
-              <th style="color: white;">Violations</th>
-              <th style="color: white;">Date Recorded</th>
+              <th style="color: white; padding: 8px;">Student ID</th>
+              <th style="color: white; padding: 8px;">Name</th>
+              <th style="color: white; padding: 8px;">Violations</th>
+              <th style="color: white; padding: 8px;">Date Recorded</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="record in studentRecords" :key="record.id">
-              <td style="color: white;">{{ record.id }}</td>
-              <td style="color: white;">{{ record.name }}</td>
-              <td style="color: white;">{{ record.violations }}</td>
-              <td style="color: white;">{{ record.dateRecorded }}</td>
+              <td style="color: white; padding: 8px;">{{ record.id }}</td>
+              <td style="color: white; padding: 8px;">{{ record.name }}</td>
+              <td style="color: white; padding: 8px;">{{ record.violations }}</td>
+              <td style="color: white; padding: 8px;">{{ record.dateRecorded }}</td>
             </tr>
           </tbody>
         </v-table>
 
+        <!-- View History Button -->
         <v-btn
           v-if="studentRecords.length > 0"
           @click="showHistory(studentRecords[0])"
@@ -94,6 +100,7 @@ function showHistory(record) {
         </v-btn>
       </v-container>
 
+      <!-- History Modal -->
       <v-dialog v-model="historyModalVisible" max-width="600px">
         <v-card>
           <v-card-title style="color: white;">{{ selectedStudent?.name }}'s Record History</v-card-title>
