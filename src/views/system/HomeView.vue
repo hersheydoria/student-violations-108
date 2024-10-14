@@ -27,13 +27,12 @@ const violationTypes = [
   'Gambling',
   'Bribery Receiving Bribe',
   'Having Abusive Affiliation',
-  'Unauthorized Use CSU Management',
   'Blocking Publication',
   'Disregard Code Conduct',
   'Abuse Code Ceremony',
   'Violating Policies',
   'Ignoring Flag Ceremony',
-  'None Wearing ID'
+  'Not Wearing ID'
 ]
 
 // State variables for modals
