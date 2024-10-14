@@ -126,12 +126,12 @@ watch(studentID, (newVal) => {
 
     <!-- History Modal -->
 <v-dialog v-model="historyModalVisible" max-width="600px">
-  <v-card>
+  <v-card style="background-color: #E6FFB1;">
     <v-card-title style="color: black; text-align: center; font-weight: bold; justify-content: center; display: flex; font-size: 18px;">
       {{ selectedStudent?.name }}'s Record History
     </v-card-title>
-    <v-card-text>
-      <v-table >
+    <v-card-text >
+      <v-table style="background-color: transparent">
         <thead>
           <tr>
             <th style="color: black; border: 1px solid black; font-weight: bold; font-size: 16px; text-align: center;">Violation</th>
