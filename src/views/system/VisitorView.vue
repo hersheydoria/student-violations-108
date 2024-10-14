@@ -23,19 +23,26 @@ const studentsData = [
 const historyData = [
   { id: '221-00598', name: 'May Estroga', violation: 'Ignoring Flag Ceremony', dateRecorded: '2024-09-15' },
   { id: '221-00598', name: 'May Estroga', violation: 'Unauthorized Use CSU Management', dateRecorded: '2024-09-16' },
-  
   { id: '221-00600', name: 'Rovannah Delola', violation: 'Gambling', dateRecorded: '2024-09-31' }
 ];
 
 const studentID = ref(''); // The student's ID input
 const studentRecords = ref([]); // To store records for the student
+const noRecordMessage = ref(''); // Message for no record
 const historyModalVisible = ref(false); // Control visibility of the history modal
 const selectedStudent = ref(null); // To store the selected student
 
 // Function to handle ID input when Enter button is clicked
 function handleEnterClick() {
   const student = studentsData.filter(s => s.id === studentID.value);
-  studentRecords.value = student.length > 0 ? student : [];
+  
+  if (student.length > 0) {
+    studentRecords.value = student;
+    noRecordMessage.value = ''; // Clear no record message
+  } else {
+    studentRecords.value = []; // Clear records if no student found
+    noRecordMessage.value = 'No Record'; // Set no record message
+  }
 }
 
 // Function to open the history modal
@@ -60,6 +67,7 @@ const closeModal = () => {
 watch(studentID, (newVal) => {
   if (!newVal) {
     studentRecords.value = []; // Clear records when input is cleared
+    noRecordMessage.value = ''; // Clear no record message
   }
 });
 </script>
@@ -112,6 +120,11 @@ watch(studentID, (newVal) => {
           </tbody>
         </v-table>
 
+        <!-- Display No Record message if applicable -->
+        <div v-if="noRecordMessage" class="mt-4" style="color: white; font-weight: bold; text-align: center;">
+          {{ noRecordMessage }}
+        </div>
+
         <!-- View History Button -->
         <v-btn
           v-if="studentRecords.length > 0"
@@ -124,42 +137,40 @@ watch(studentID, (newVal) => {
         </v-btn>
       </v-container>
 
-  <!-- History Modal -->
-<v-dialog v-model="historyModalVisible" max-width="600px">
-  <v-card style="background-color: #E6FFB1;">
-    <v-card-title style="color: black; text-align: center; font-weight: bold; justify-content: center; display: flex; font-size: 18px;">
-      {{ selectedStudent?.name }}'s Record History
-    </v-card-title>
-    <v-card-text>
-      <v-table style="background-color: transparent">
-        <thead>
-          <tr>
-            <th style="color: black; border: 1px solid black; font-weight: bold; font-size: 16px; text-align: center;">Violation</th>
-            <th style="color: black; border: 1px solid black; font-weight: bold; font-size: 16px; text-align: center;">Date Recorded</th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-if="selectedStudent?.records.length > 0">
-            <tr v-for="(history, index) in selectedStudent.records" :key="index">
-              <td style="color: black; border: 1px solid black; font-size: 16px; text-align: center;">{{ history.violation }}</td>
-              <td style="color: black; border: 1px solid black; font-size: 16px; text-align: center;">{{ history.dateRecorded }}</td>
-            </tr>
-          </template>
-          <template v-else>
-            <tr>
-              <td colspan="2" style="color: black; font-size: 16px; text-align: center;">No History</td>
-            </tr>
-          </template>
-        </tbody>
-      </v-table>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn @click="closeModal" color="black" style="color: white;">Close</v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
-
-
+      <!-- History Modal -->
+      <v-dialog v-model="historyModalVisible" max-width="600px">
+        <v-card style="background-color: #E6FFB1;">
+          <v-card-title style="color: black; text-align: center; font-weight: bold; justify-content: center; display: flex; font-size: 18px;">
+            {{ selectedStudent?.name }}'s Record History
+          </v-card-title>
+          <v-card-text>
+            <v-table style="background-color: transparent">
+              <thead>
+                <tr>
+                  <th style="color: black; border: 1px solid black; font-weight: bold; font-size: 16px; text-align: center;">Violation</th>
+                  <th style="color: black; border: 1px solid black; font-weight: bold; font-size: 16px; text-align: center;">Date Recorded</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template v-if="selectedStudent?.records.length > 0">
+                  <tr v-for="(history, index) in selectedStudent.records" :key="index">
+                    <td style="color: black; border: 1px solid black; font-size: 16px; text-align: center;">{{ history.violation }}</td>
+                    <td style="color: black; border: 1px solid black; font-size: 16px; text-align: center;">{{ history.dateRecorded }}</td>
+                  </tr>
+                </template>
+                <template v-else>
+                  <tr>
+                    <td colspan="2" style="color: black; font-size: 16px; text-align: center;">No History</td>
+                  </tr>
+                </template>
+              </tbody>
+            </v-table>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn @click="closeModal" color="black" style="color: white;">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
 
     </AppLayout>
   </v-app>
