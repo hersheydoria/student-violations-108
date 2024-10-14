@@ -112,7 +112,7 @@ function onResetPassword() {
         class="px-6 py-6"
         elevation="12"
         rounded="xl"
-        style="background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px)"
+        style="background-color: #e6ffb1; backdrop-filter: blur(8px)"
       >
         <v-card-title class="headline"><strong>Reset Password</strong></v-card-title>
         <v-card-text>

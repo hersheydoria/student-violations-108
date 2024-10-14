@@ -13,7 +13,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
             class="px-6 py-6"
             elevation="12"
             rounded="xl"
-            style="background-color: rgba(255, 255, 255, 0.3); backdrop-filter: blur(8px)"
+            style="background-color: #e6ffb1; backdrop-filter: blur(8px)"
           >
             <!-- Add image above the heading -->
             <v-img
@@ -26,7 +26,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 
             <!-- Card title for "Login" -->
             <v-card-title class="text-center">
-              <h2 class="font-weight-bold" style="color: #006400">Login</h2>
+              <h2 class="font-weight-bold" style="color: #286643">Login</h2>
             </v-card-title>
 
             <!-- Card content -->
