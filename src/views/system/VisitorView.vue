@@ -95,7 +95,7 @@ function showHistory(record) {
           v-if="studentRecords.length > 0"
           @click="showHistory(studentRecords[0])"
           color="#286643"
-          class="mt-4"
+          class="mt-16"
           style="color: white; border: 2px solid #E6FFB1;"
         >
           View History
