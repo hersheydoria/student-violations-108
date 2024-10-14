@@ -64,26 +64,26 @@ function showHistory(record) {
           </template>
         </v-text-field>
 
-        <!-- Transparent table for student records -->
+        <!-- Transparent table for student records with white border -->
         <v-table
           v-if="studentRecords.length > 0"
           class="mt-4"
-          style="background-color: rgba(0, 0, 0, 0); color: white;"
+          style="background-color: rgba(0, 0, 0, 0); color: white; border: 1px solid white; border-collapse: collapse;"
         >
           <thead>
             <tr>
-              <th style="color: white; padding: 8px;">Student ID</th>
-              <th style="color: white; padding: 8px;">Name</th>
-              <th style="color: white; padding: 8px;">Violations</th>
-              <th style="color: white; padding: 8px;">Date Recorded</th>
+              <th style="color: white; padding: 8px; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Student ID</th>
+              <th style="color: white; padding: 8px; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Name</th>
+              <th style="color: white; padding: 8px; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Violations</th>
+              <th style="color: white; padding: 8px; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Date Recorded</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="record in studentRecords" :key="record.id">
-              <td style="color: white; padding: 8px;">{{ record.id }}</td>
-              <td style="color: white; padding: 8px;">{{ record.name }}</td>
-              <td style="color: white; padding: 8px;">{{ record.violations }}</td>
-              <td style="color: white; padding: 8px;">{{ record.dateRecorded }}</td>
+              <td style="color: white; padding: 8px; border: 1px solid white; font-size: 16px; text-align: center;">{{ record.id }}</td>
+              <td style="color: white; padding: 8px; border: 1px solid white; font-size: 16px; text-align: center;">{{ record.name }}</td>
+              <td style="color: white; padding: 8px; border: 1px solid white; font-size: 16px; text-align: center;">{{ record.violations }}</td>
+              <td style="color: white; padding: 8px; border: 1px solid white; font-size: 16px; text-align: center;">{{ record.dateRecorded }}</td>
             </tr>
           </tbody>
         </v-table>
@@ -108,14 +108,14 @@ function showHistory(record) {
             <v-table>
               <thead>
                 <tr>
-                  <th style="color: white;">Violation</th>
-                  <th style="color: white;">Date Recorded</th>
+                  <th style="color: white; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Violation</th>
+                  <th style="color: white; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Date Recorded</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td style="color: white;">{{ selectedStudent?.violations }}</td>
-                  <td style="color: white;">{{ selectedStudent?.dateRecorded }}</td>
+                  <td style="color: white; border: 1px solid white; font-weight: bold; font-size: 16px;">{{ selectedStudent?.violations }}</td>
+                  <td style="color: white; border: 1px solid white; font-weight: bold; font-size: 16px;">{{ selectedStudent?.dateRecorded }}</td>
                 </tr>
               </tbody>
             </v-table>
