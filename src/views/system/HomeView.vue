@@ -173,7 +173,7 @@ const toggleLeftSidebar = () => {
                     <v-toolbar-title>Violation Records</v-toolbar-title>
                   </v-toolbar>
                 </template>
-                <template v-slot:item.action="{ item }">
+                <template v-slot:item.="{ item }">
                   <v-btn @click="unblockViolation(item.id)" color="green">UNBLOCK</v-btn>
                 </template>
               </v-data-table>
