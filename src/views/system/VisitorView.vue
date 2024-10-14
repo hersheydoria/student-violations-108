@@ -23,7 +23,7 @@ const studentsData = [
 const historyData = [
   { id: '221-00598', name: 'May Estroga', violation: 'Ignoring Flag Ceremony', dateRecorded: '2024-09-15' },
   { id: '221-00598', name: 'May Estroga', violation: 'Unauthorized Use CSU Management', dateRecorded: '2024-09-16' },
-  { id: '221-00599', name: 'Hershey Doria', violation: 'Disregard Code Conduct', dateRecorded: '2024-09-15' },
+  
   { id: '221-00600', name: 'Rovannah Delola', violation: 'Gambling', dateRecorded: '2024-09-31' }
 ];
 
@@ -124,13 +124,13 @@ watch(studentID, (newVal) => {
         </v-btn>
       </v-container>
 
-    <!-- History Modal -->
+  <!-- History Modal -->
 <v-dialog v-model="historyModalVisible" max-width="600px">
   <v-card style="background-color: #E6FFB1;">
     <v-card-title style="color: black; text-align: center; font-weight: bold; justify-content: center; display: flex; font-size: 18px;">
       {{ selectedStudent?.name }}'s Record History
     </v-card-title>
-    <v-card-text >
+    <v-card-text>
       <v-table style="background-color: transparent">
         <thead>
           <tr>
@@ -139,10 +139,17 @@ watch(studentID, (newVal) => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(history, index) in selectedStudent?.records" :key="index">
-            <td style="color: black; border: 1px solid black; font-size: 16px; text-align: center;">{{ history.violation }}</td>
-            <td style="color: black; border: 1px solid black; font-size: 16px; text-align: center;">{{ history.dateRecorded }}</td>
-          </tr>
+          <template v-if="selectedStudent?.records.length > 0">
+            <tr v-for="(history, index) in selectedStudent.records" :key="index">
+              <td style="color: black; border: 1px solid black; font-size: 16px; text-align: center;">{{ history.violation }}</td>
+              <td style="color: black; border: 1px solid black; font-size: 16px; text-align: center;">{{ history.dateRecorded }}</td>
+            </tr>
+          </template>
+          <template v-else>
+            <tr>
+              <td colspan="2" style="color: black; font-size: 16px; text-align: center;">No History</td>
+            </tr>
+          </template>
         </tbody>
       </v-table>
     </v-card-text>
@@ -151,6 +158,8 @@ watch(studentID, (newVal) => {
     </v-card-actions>
   </v-card>
 </v-dialog>
+
+
 
     </AppLayout>
   </v-app>
