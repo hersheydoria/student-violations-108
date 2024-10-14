@@ -101,7 +101,7 @@ const toggleLeftSidebar = () => {
         app
         width="256"
         mini-width="56"
-        style="color: #006400"
+        style="background-color: #e6ffb1"
       >
         <v-list>
           <v-list-item class="text-center">
@@ -167,9 +167,10 @@ const toggleLeftSidebar = () => {
                 item-value="id"
                 class="mt-5"
                 :footer-props="{ 'items-per-page-options': [] }"
+                style="background-color: #e6ffb1"
               >
                 <template #top>
-                  <v-toolbar flat>
+                  <v-toolbar flat style="background-color: #e6ffb1">
                     <v-toolbar-title>Violation Records</v-toolbar-title>
                   </v-toolbar>
                 </template>
