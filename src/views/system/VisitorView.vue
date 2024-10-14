@@ -39,7 +39,7 @@ function showHistory(record) {
 <template>
   <v-app>
     <AppLayout>
-      <v-app-bar class="px-3" color="green lighten-1">
+      <v-app-bar class="px-3" color="#3A986a">
         <v-toolbar-title style="color: white;">Visitor Page</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn text style="color: white;" @click="goToLogin">Log In</v-btn>
@@ -58,32 +58,32 @@ function showHistory(record) {
           style="color: white;"
         >
           <template v-slot:append>
-            <v-btn @click="handleEnterClick" color="green" style="color: white;">
+            <v-btn @click="handleEnterClick" color="#37b477" style="color: black;">
               Enter
             </v-btn>
           </template>
         </v-text-field>
 
-        <!-- Transparent table for student records with white border -->
+        <!-- Table for student records with light yellow background, green border, shadow, and elevation -->
         <v-table
           v-if="studentRecords.length > 0"
           class="mt-4"
-          style="background-color: rgba(0, 0, 0, 0); color: white; border: 1px solid white; border-collapse: collapse;"
+          style="background-color: #E6FFB1; border: 1px solid #5ea34f; border-collapse: collapse; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); border-radius: 8px;"
         >
           <thead>
             <tr>
-              <th style="color: white; padding: 8px; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Student ID</th>
-              <th style="color: white; padding: 8px; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Name</th>
-              <th style="color: white; padding: 8px; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Violations</th>
-              <th style="color: white; padding: 8px; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Date Recorded</th>
+              <th style="color: black; padding: 8px; border: 1px solid green; font-weight: bold; font-size: 16px; text-align: center;">Student ID</th>
+              <th style="color: black; padding: 8px; border: 1px solid green; font-weight: bold; font-size: 16px; text-align: center;">Name</th>
+              <th style="color: black; padding: 8px; border: 1px solid green; font-weight: bold; font-size: 16px; text-align: center;">Violations</th>
+              <th style="color: black; padding: 8px; border: 1px solid green; font-weight: bold; font-size: 16px; text-align: center;">Date Recorded</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="record in studentRecords" :key="record.id">
-              <td style="color: white; padding: 8px; border: 1px solid white; font-size: 16px; text-align: center;">{{ record.id }}</td>
-              <td style="color: white; padding: 8px; border: 1px solid white; font-size: 16px; text-align: center;">{{ record.name }}</td>
-              <td style="color: white; padding: 8px; border: 1px solid white; font-size: 16px; text-align: center;">{{ record.violations }}</td>
-              <td style="color: white; padding: 8px; border: 1px solid white; font-size: 16px; text-align: center;">{{ record.dateRecorded }}</td>
+              <td style="color: black; padding: 8px; border: 1px solid green; font-size: 16px; text-align: center;">{{ record.id }}</td>
+              <td style="color: black; padding: 8px; border: 1px solid green; font-size: 16px; text-align: center;">{{ record.name }}</td>
+              <td style="color: black; padding: 8px; border: 1px solid green; font-size: 16px; text-align: center;">{{ record.violations }}</td>
+              <td style="color: black; padding: 8px; border: 1px solid green; font-size: 16px; text-align: center;">{{ record.dateRecorded }}</td>
             </tr>
           </tbody>
         </v-table>
@@ -92,9 +92,9 @@ function showHistory(record) {
         <v-btn
           v-if="studentRecords.length > 0"
           @click="showHistory(studentRecords[0])"
-          color="green"
+          color="#37b477"
           class="mt-4"
-          style="color: white;"
+          style="color: black;"
         >
           View History
         </v-btn>
@@ -103,19 +103,19 @@ function showHistory(record) {
       <!-- History Modal -->
       <v-dialog v-model="historyModalVisible" max-width="600px">
         <v-card>
-          <v-card-title style="color: white;">{{ selectedStudent?.name }}'s Record History</v-card-title>
+          <v-card-title style="color: green;">{{ selectedStudent?.name }}'s Record History</v-card-title>
           <v-card-text>
             <v-table>
               <thead>
                 <tr>
-                  <th style="color: white; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Violation</th>
-                  <th style="color: white; border: 1px solid white; font-weight: bold; font-size: 16px; text-align: center;">Date Recorded</th>
+                  <th style="color: green; border: 1px solid green; font-weight: bold; font-size: 16px; text-align: center;">Violation</th>
+                  <th style="color: green; border: 1px solid green; font-weight: bold; font-size: 16px; text-align: center;">Date Recorded</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td style="color: white; border: 1px solid white; font-weight: bold; font-size: 16px;">{{ selectedStudent?.violations }}</td>
-                  <td style="color: white; border: 1px solid white; font-weight: bold; font-size: 16px;">{{ selectedStudent?.dateRecorded }}</td>
+                  <td style="color: green; border: 1px solid green; font-weight: bold; font-size: 16px;">{{ selectedStudent?.violations }}</td>
+                  <td style="color: green; border: 1px solid green; font-weight: bold; font-size: 16px;">{{ selectedStudent?.dateRecorded }}</td>
                 </tr>
               </tbody>
             </v-table>
