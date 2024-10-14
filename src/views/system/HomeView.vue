@@ -57,12 +57,12 @@ const addViolation = () => {
 
 // Method to unblock a violation
 const unblockViolation = (violationId) => {
-  const index = violations.value.findIndex(v => v.id === violationId);
+  const index = violations.value.findIndex((v) => v.id === violationId)
   if (index !== -1) {
-    const unblockedViolation = violations.value[index];
-    unblockedViolation.status = 'Unblocked'; // Change status to 'Unblocked'
-    history.value.push(unblockedViolation); // Add to history
-    violations.value.splice(index, 1); // Remove from current violations
+    const unblockedViolation = violations.value[index]
+    unblockedViolation.status = 'Unblocked' // Change status to 'Unblocked'
+    history.value.push(unblockedViolation) // Add to history
+    violations.value.splice(index, 1) // Remove from current violations
   }
 }
 
@@ -105,8 +105,9 @@ const toggleLeftSidebar = () => {
       >
         <v-list>
           <v-list-item class="text-center">
-            <v-avatar size="150" class="mx-auto"> <!-- Increased profile picture size -->
-              <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
+            <v-avatar size="150" class="mx-auto">
+              <!-- Increased profile picture size -->
+              <v-img src="account.jpg" alt="Profile Picture" />
             </v-avatar>
           </v-list-item>
           <v-list-item>
@@ -130,7 +131,8 @@ const toggleLeftSidebar = () => {
       <v-navigation-drawer v-model="showRightSidebar" temporary app right>
         <v-list>
           <v-list-item class="text-center">
-            <v-avatar size="120" class="mx-auto"> <!-- Increased profile picture size -->
+            <v-avatar size="120" class="mx-auto">
+              <!-- Increased profile picture size -->
               <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
             </v-avatar>
           </v-list-item>
@@ -155,7 +157,12 @@ const toggleLeftSidebar = () => {
         <v-container fluid>
           <v-row>
             <v-col cols="12" class="d-flex align-center justify-space-between">
-              <v-btn @click="showForm = true" color="#286643" style="color: white; border: 2px solid #E6FFB1;">Add Violation</v-btn>
+              <v-btn
+                @click="showForm = true"
+                color="#286643"
+                style="color: white; border: 2px solid #e6ffb1"
+                >Add Violation</v-btn
+              >
             </v-col>
           </v-row>
 
@@ -182,7 +189,12 @@ const toggleLeftSidebar = () => {
               <!-- Align buttons to the right at the bottom of the table -->
               <v-row class="justify-end mt-3">
                 <v-col cols="auto">
-                  <v-btn @click="showHistory" color="#286643" style="color: white; border: 2px solid #E6FFB1;">View History</v-btn>
+                  <v-btn
+                    @click="showHistory"
+                    color="#286643"
+                    style="color: white; border: 2px solid #e6ffb1"
+                    >View History</v-btn
+                  >
                 </v-col>
               </v-row>
             </v-col>
@@ -238,7 +250,6 @@ const toggleLeftSidebar = () => {
               </v-card-actions>
             </v-card>
           </v-dialog>
-
         </v-container>
       </v-main>
     </AppLayout>
