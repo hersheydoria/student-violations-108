@@ -9,12 +9,16 @@ import AppLayout from '@/components/layout/AppLayout.vue'
     <AppLayout>
       <v-row class="d-flex justify-center align-center">
         <v-col cols="12" md="6">
+<<<<<<< HEAD
           <v-card
             class="px-6 py-6"
             elevation="12"
             rounded="xl"
             style="background-color: rgba(255, 255, 255, 0.3); backdrop-filter: blur(8px)"
           >
+=======
+          <v-card class="px-6 py-6" elevation="12" rounded="xl" style="background-color: #e6ffb1">
+>>>>>>> 8b7db18becb83c136553c5f11f3ddc2a97d9485e
             <!-- Add image above the heading -->
             <v-img
               src="/logo6.png"
