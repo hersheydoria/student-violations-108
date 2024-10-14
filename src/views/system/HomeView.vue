@@ -105,7 +105,7 @@ const toggleLeftSidebar = () => {
       >
         <v-list>
           <v-list-item class="text-center">
-            <v-avatar size="100" class="mx-auto">
+            <v-avatar size="150" class="mx-auto"> <!-- Increased profile picture size -->
               <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
             </v-avatar>
           </v-list-item>
@@ -130,7 +130,7 @@ const toggleLeftSidebar = () => {
       <v-navigation-drawer v-model="showRightSidebar" temporary app right>
         <v-list>
           <v-list-item class="text-center">
-            <v-avatar size="100" class="mx-auto">
+            <v-avatar size="120" class="mx-auto"> <!-- Increased profile picture size -->
               <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
             </v-avatar>
           </v-list-item>
