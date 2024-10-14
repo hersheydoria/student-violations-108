@@ -19,6 +19,14 @@ const studentsData = [
   { id: '221-00600', name: 'Rovannah Delola', violation: 'Absent', dateRecorded: '2024-02-05' }
 ];
 
+// Historical records for the students (these should be different from the student records)
+const historyData = [
+  { id: '221-00598', name: 'May Estroga', violation: 'Ignoring Flag Ceremony', dateRecorded: '2024-09-15' },
+  { id: '221-00598', name: 'May Estroga', violation: 'Unauthorized Use CSU Management', dateRecorded: '2024-09-16' },
+  { id: '221-00599', name: 'Hershey Doria', violation: 'Disregard Code Conduct', dateRecorded: '2024-09-15' },
+  { id: '221-00600', name: 'Rovannah Delola', violation: 'Gambling', dateRecorded: '2024-09-31' }
+];
+
 const studentID = ref(''); // The student's ID input
 const studentRecords = ref([]); // To store records for the student
 const historyModalVisible = ref(false); // Control visibility of the history modal
@@ -32,7 +40,14 @@ function handleEnterClick() {
 
 // Function to open the history modal
 function showHistory(record) {
-  selectedStudent.value = record;
+  // Fetch historical records based on student ID
+  const historicalRecords = historyData.filter(h => h.id === record.id);
+  
+  selectedStudent.value = {
+    name: record.name, // Keep the selected student's name
+    records: historicalRecords
+  };
+  
   historyModalVisible.value = true;
 }
 
@@ -59,7 +74,7 @@ watch(studentID, (newVal) => {
       </v-app-bar>
 
       <v-container>
-        <div class="mt-16">
+        <div class="mt-1">
           <p style="color: white;">Enter your student ID number</p>
         </div>
 
@@ -77,7 +92,7 @@ watch(studentID, (newVal) => {
           </template>
         </v-text-field>
 
-        <!-- Table for student records with light yellow background, green border, shadow, and elevation -->
+        <!-- Table for student records -->
         <v-table v-if="studentRecords.length > 0" class="mt-4" style="background-color: #E6FFB1; border: 1px solid #5ea34f; border-collapse: collapse; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); border-radius: 8px;">
           <thead>
             <tr>
@@ -109,32 +124,34 @@ watch(studentID, (newVal) => {
         </v-btn>
       </v-container>
 
-      <!-- History Modal -->
-      <v-dialog v-model="historyModalVisible" max-width="600px">
-        <v-card>
-          <v-card-title style="color: green;">{{ selectedStudent?.name }}'s Record History</v-card-title>
-          <v-card-text>
-            <v-table>
-              <thead>
-                <tr>
-                  <th style="color: green; border: 1px solid green; font-weight: bold; font-size: 16px; text-align: center;">Violation</th>
-                  <th style="color: green; border: 1px solid green; font-weight: bold; font-size: 16px; text-align: center;">Date Recorded</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style="color: green; border: 1px solid green; font-weight: bold; font-size: 16px;">{{ selectedStudent?.violation }}</td>
-                  <td style="color: green; border: 1px solid green; font-weight: bold; font-size: 16px;">{{ selectedStudent?.dateRecorded }}</td>
-                </tr>
-              </tbody>
-            </v-table>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn @click="closeModal" color="grey" style="color: white;">Close</v-btn> <!-- Use closeModal here -->
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+    <!-- History Modal -->
+<v-dialog v-model="historyModalVisible" max-width="600px">
+  <v-card>
+    <v-card-title style="color: black; text-align: center; font-weight: bold; justify-content: center; display: flex; font-size: 18px;">
+      {{ selectedStudent?.name }}'s Record History
+    </v-card-title>
+    <v-card-text>
+      <v-table >
+        <thead>
+          <tr>
+            <th style="color: black; border: 1px solid black; font-weight: bold; font-size: 16px; text-align: center;">Violation</th>
+            <th style="color: black; border: 1px solid black; font-weight: bold; font-size: 16px; text-align: center;">Date Recorded</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(history, index) in selectedStudent?.records" :key="index">
+            <td style="color: black; border: 1px solid black; font-size: 16px; text-align: center;">{{ history.violation }}</td>
+            <td style="color: black; border: 1px solid black; font-size: 16px; text-align: center;">{{ history.dateRecorded }}</td>
+          </tr>
+        </tbody>
+      </v-table>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn @click="closeModal" color="black" style="color: white;">Close</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
     </AppLayout>
   </v-app>
 </template>
