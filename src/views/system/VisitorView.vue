@@ -39,10 +39,10 @@ function showHistory(record) {
 <template>
   <v-app>
     <AppLayout>
-      <v-app-bar class="px-3" color="#3A986a">
-        <v-toolbar-title style="color: white;">Visitor Page</v-toolbar-title>
+      <v-app-bar class="px-3" color="#e6ffb1">
+        <v-toolbar-title style="color: black;">Visitor Page</v-toolbar-title>
         <v-spacer></v-spacer>
-        <v-btn text style="color: white;" @click="goToLogin">Log In</v-btn>
+        <v-btn text style="color: black; border: 2px solid green;" @click="goToLogin">Log In</v-btn>
       </v-app-bar>
 
       <v-container>
@@ -58,7 +58,7 @@ function showHistory(record) {
           style="color: white;"
         >
           <template v-slot:append>
-            <v-btn @click="handleEnterClick" color="#286643" style="color: #e6ffb1; border: 2px solid #E6FFB1;">
+            <v-btn @click="handleEnterClick" color="#286643" style="color: white; border: 2px solid #E6FFB1;">
               Enter
             </v-btn>
           </template>
@@ -94,7 +94,7 @@ function showHistory(record) {
           @click="showHistory(studentRecords[0])"
           color="#286643"
           class="mt-4"
-          style="color: #E6FFB1; border: 2px solid #E6FFB1;"
+          style="color: white; border: 2px solid #E6FFB1;"
         >
           View History
         </v-btn>
