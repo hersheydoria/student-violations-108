@@ -21,7 +21,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 
             <!-- Card title for "Login" -->
             <v-card-title class="text-center">
-              <h3 class="font-weight-bold" style="color: #006400">Login</h3>
+              <h3 class="font-weight-bold" style="color: #286643">Login</h3>
             </v-card-title>
 
             <!-- Card content -->

@@ -7,7 +7,6 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const showForm = ref(false)
 const showLeftSidebar = ref(false)
-const showRightSidebar = ref(false)
 const newViolation = ref({
   studentId: '',
   type: ''
@@ -23,7 +22,7 @@ const headers = [
   { text: 'Action', value: 'action', sortable: false }
 ]
 const violationTypes = [
-  'Dress Code Violation',
+  'Dress Code',
   'Disruption Obstruction',
   'Gambling',
   'Bribery Receiving Bribe',
@@ -101,7 +100,7 @@ const toggleLeftSidebar = () => {
         app
         width="256"
         mini-width="56"
-        style="background-color: #e6ffb1"
+        style="background-color: rgba(230, 255, 177, 0.7); backdrop-filter: blur(10px)"
       >
         <v-list>
           <v-list-item class="text-center">
@@ -127,42 +126,26 @@ const toggleLeftSidebar = () => {
         </v-list>
       </v-navigation-drawer>
 
-      <!-- Right Sidebar (if needed) -->
-      <v-navigation-drawer v-model="showRightSidebar" temporary app right>
-        <v-list>
-          <v-list-item class="text-center">
-            <v-avatar size="120" class="mx-auto">
-              <!-- Increased profile picture size -->
-              <v-img src="https://via.placeholder.com/100" alt="Profile Picture" />
-            </v-avatar>
-          </v-list-item>
-          <v-list-item>
-            <p><strong>ID Number:</strong></p>
-          </v-list-item>
-          <v-list-item>
-            <p><strong>Name:</strong></p>
-          </v-list-item>
-          <v-list-item>
-            <p><strong>Email:</strong></p>
-          </v-list-item>
-          <v-list-item>
-            <p><strong>Role:</strong></p>
-          </v-list-item>
-          <v-divider></v-divider>
-          <v-list-item @click="logout">Logout</v-list-item>
-        </v-list>
-      </v-navigation-drawer>
-
       <v-main>
-        <v-container fluid>
-          <v-row>
-            <v-col cols="12" class="d-flex align-center justify-space-between">
+        <v-container fluid style="margin-top: -300px">
+          <v-row class="d-flex justify-end align-center">
+            <v-col cols="auto">
               <v-btn
                 @click="showForm = true"
                 color="#286643"
                 style="color: white; border: 2px solid #e6ffb1"
-                >Add Violation</v-btn
               >
+                Add Violation
+              </v-btn>
+            </v-col>
+            <v-col cols="auto">
+              <v-btn
+                @click="showHistory"
+                color="#286643"
+                style="color: white; border: 2px solid #e6ffb1"
+              >
+                View History
+              </v-btn>
             </v-col>
           </v-row>
 
@@ -178,57 +161,59 @@ const toggleLeftSidebar = () => {
               >
                 <template #top>
                   <v-toolbar flat style="background-color: #e6ffb1">
-                    <v-toolbar-title>Violation Records</v-toolbar-title>
+                    <v-toolbar-title><strong>RECORDS</strong></v-toolbar-title>
                   </v-toolbar>
                 </template>
-                <template v-slot:item.="{ item }">
+
+                <!-- This is where you define the custom slot for the "Action" column -->
+                <template v-slot:item.action="{ item }">
                   <v-btn @click="unblockViolation(item.id)" color="green">UNBLOCK</v-btn>
                 </template>
               </v-data-table>
-
-              <!-- Align buttons to the right at the bottom of the table -->
-              <v-row class="justify-end mt-3">
-                <v-col cols="auto">
-                  <v-btn
-                    @click="showHistory"
-                    color="#286643"
-                    style="color: white; border: 2px solid #e6ffb1"
-                    >View History</v-btn
-                  >
-                </v-col>
-              </v-row>
             </v-col>
           </v-row>
 
           <!-- Add Violation Modal -->
-          <v-dialog v-model="showForm" max-width="600px">
-            <v-card>
-              <v-card-title>Add Violation</v-card-title>
+          <v-dialog
+            v-model="showForm"
+            max-width="600px"
+            elevation="10"
+            style="backdrop-filter: blur(8px)"
+          >
+            <v-card class="px-6 py-6" elevation="12" rounded="xl" style="background-color: #e6ffb1">
+              <v-card-title class="headline"><strong>ADD VIOLATION</strong></v-card-title>
               <v-card-text>
-                <v-text-field
-                  label="ID Number"
-                  v-model="newViolation.studentId"
-                  required
-                ></v-text-field>
-                <v-select
-                  label="Violation Type"
-                  v-model="newViolation.type"
-                  :items="violationTypes"
-                  required
-                ></v-select>
+                <v-form v-model="valid" lazy-validation>
+                  <v-text-field
+                    label="ID Number"
+                    v-model="newViolation.studentId"
+                    required
+                  ></v-text-field>
+                  <v-select
+                    label="Violation Type"
+                    v-model="newViolation.type"
+                    :items="violationTypes"
+                    required
+                  ></v-select>
+                </v-form>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn @click="showForm = false" color="grey">Cancel</v-btn>
-                <v-btn @click="addViolation" color="pink">Add</v-btn>
+                <v-btn @click="addViolation" color="customGreen">Add</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
 
           <!-- View History Modal -->
-          <v-dialog v-model="showViewHistory" max-width="600px">
-            <v-card>
-              <v-card-title>History</v-card-title>
+          <v-dialog
+            v-model="showViewHistory"
+            max-width="600px"
+            elevation="10"
+            style="backdrop-filter: blur(8px)"
+          >
+            <v-card class="px-6 py-6" elevation="12" rounded="xl" style="background-color: #e6ffb1">
+              <v-card-title class="headline"><strong>HISTORY</strong></v-card-title>
               <v-card-text>
                 <v-data-table
                   :headers="headers"
@@ -236,12 +221,8 @@ const toggleLeftSidebar = () => {
                   item-value="id"
                   class="mt-5"
                   :footer-props="{ 'items-per-page-options': [] }"
+                  style="background-color: transparent"
                 >
-                  <template #top>
-                    <v-toolbar flat>
-                      <v-toolbar-title>Violation History</v-toolbar-title>
-                    </v-toolbar>
-                  </template>
                 </v-data-table>
               </v-card-text>
               <v-card-actions>
