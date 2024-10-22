@@ -1,9 +1,7 @@
 <script setup>
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { useViolationRecords } from '@/stores/useViolationRecords'
-import { ref } from 'vue'
-import { QrcodeStream } from 'vue3-qrcode-reader'
-
+// Use the composable to get access to the methods and state
 const {
   showForm,
   showLeftSidebar,
@@ -17,33 +15,18 @@ const {
   logout,
   showViewHistory,
   toggleViewHistory,
-  toggleLeftSidebar
+  toggleLeftSidebar,
+  valid,
+  selectedMethod,
+  showQrScanner,
+  showStudentInfoModal,
+  selectedStudent,
+  user,
+  findStudentByName,
+  onNameInput,
+  showStudentDetails,
+  onQrCodeScanned
 } = useViolationRecords()
-
-// Form validation state
-const valid = ref(false)
-
-// State for selecting the input method
-const selectedMethod = ref('idNumber')
-
-// State for controlling the visibility of the QR code scanner modal
-const showQrScanner = ref(false)
-
-// Placeholder user information (you may want to fetch this dynamically based on logged-in user data)
-const user = {
-  idNumber: '12345678',
-  name: 'John Doe',
-  email: 'johndoe@example.com',
-  role: 'Security Guard'
-}
-
-// Function to handle QR code scanning result
-const onQrCodeScanned = (result) => {
-  if (result) {
-    newViolation.value.studentId = result // Assuming the QR code contains the student ID
-    showQrScanner.value = false // Close the QR code scanner modal after scanning
-  }
-}
 </script>
 
 <template>
@@ -75,16 +58,16 @@ const onQrCodeScanned = (result) => {
             </v-avatar>
           </v-list-item>
           <v-list-item>
-            <p><strong>ID Number:</strong> {{ user.idNumber }}</p>
+            <p><strong>ID Number:</strong> {{ user?.idNumber || 'N/A' }}</p>
           </v-list-item>
           <v-list-item>
-            <p><strong>Name:</strong> {{ user.name }}</p>
+            <p><strong>Name:</strong> {{ user?.name || 'N/A' }}</p>
           </v-list-item>
           <v-list-item>
-            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Email:</strong> {{ user?.email || 'N/A' }}</p>
           </v-list-item>
           <v-list-item>
-            <p><strong>Role:</strong> {{ user.role }}</p>
+            <p><strong>Role:</strong> {{ user?.role || 'N/A' }}</p>
           </v-list-item>
           <v-divider></v-divider>
           <v-list-item @click="logout">Logout</v-list-item>
@@ -131,12 +114,48 @@ const onQrCodeScanned = (result) => {
                   </v-toolbar>
                 </template>
 
+                <template v-slot:item.studentId="{ item }">
+                  <v-btn @click="showStudentDetails(item.studentId)" text color="green">
+                    {{ item.studentId }}
+                  </v-btn>
+                </template>
+
                 <template v-slot:item.action="{ item }">
                   <v-btn @click="unblockViolation(item.id)" color="green">UNBLOCK</v-btn>
                 </template>
               </v-data-table>
             </v-col>
           </v-row>
+
+          <v-dialog
+            v-model="showStudentInfoModal"
+            max-width="600px"
+            elevation="10"
+            style="backdrop-filter: blur(8px)"
+          >
+            <v-card class="px-6 py-6" elevation="12" rounded="xl" style="background-color: #e6ffb1">
+              <v-card-title class="headline">Student Details</v-card-title>
+              <v-card-text>
+                <v-row>
+                  <v-col cols="12" class="text-center">
+                    <v-avatar size="100">
+                      <v-img :src="selectedStudent.picture" alt="Profile Picture" />
+                    </v-avatar>
+                  </v-col>
+                  <v-col cols="12">
+                    <p><strong>Name:</strong> {{ selectedStudent.name }}</p>
+                    <p><strong>Address:</strong> {{ selectedStudent.address }}</p>
+                    <p><strong>Birthday:</strong> {{ selectedStudent.birthday }}</p>
+                    <p><strong>Program & Year:</strong> {{ selectedStudent.programYear }}</p>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="showStudentInfoModal = false">Close</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
 
           <!-- Add Violation Modal -->
           <v-dialog
@@ -170,6 +189,7 @@ const onQrCodeScanned = (result) => {
                     label="Name"
                     v-model="newViolation.name"
                     required
+                    @input="onNameInput"
                   ></v-text-field>
 
                   <!-- QR Code Scanner button -->
@@ -200,8 +220,13 @@ const onQrCodeScanned = (result) => {
           </v-dialog>
 
           <!-- QR Code Scanner Modal -->
-          <v-dialog v-model="showQrScanner" max-width="600px">
-            <v-card>
+          <v-dialog
+            v-model="showQrScanner"
+            max-width="600px"
+            elevation="10"
+            style="backdrop-filter: blur(8px)"
+          >
+            <v-card class="px-6 py-6" elevation="12" rounded="xl" style="background-color: #e6ffb1">
               <v-card-title>Scan QR Code</v-card-title>
               <v-card-text>
                 <QrcodeStream @decode="onQrCodeScanned" @init="onInit" @error="onError" />
