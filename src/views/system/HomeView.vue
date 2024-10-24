@@ -1,6 +1,8 @@
 <script setup>
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { useViolationRecords } from '@/stores/useViolationRecords'
+import { QrcodeStream } from 'vue3-qrcode-reader'
+
 // Use the composable to get access to the methods and state
 const {
   showForm,
@@ -22,10 +24,11 @@ const {
   showStudentInfoModal,
   selectedStudent,
   user,
-  findStudentByName,
   onNameInput,
   showStudentDetails,
-  onQrCodeScanned
+  onQrCodeScanned,
+  onInit,
+  onError
 } = useViolationRecords()
 </script>
 
@@ -116,7 +119,8 @@ const {
 
                 <template v-slot:item.studentId="{ item }">
                   <v-btn @click="showStudentDetails(item.studentId)" text color="green">
-                    {{ item.studentId }}
+                    {{ item.studentId || newViolation.studentId }}
+                    <!-- Ensure this line gets the correct ID -->
                   </v-btn>
                 </template>
 
@@ -181,7 +185,8 @@ const {
                     label="ID Number"
                     v-model="newViolation.studentId"
                     required
-                    type="number"
+                    type="text"
+                    :rules="[(v) => /^[0-9-]+$/.test(v) || 'Only numbers and hyphens are allowed']"
                   ></v-text-field>
 
                   <v-text-field
@@ -201,6 +206,12 @@ const {
                   >
                     Open QR Code Scanner
                   </v-btn>
+                  <!-- Display scanned ID if it exists -->
+                  <div v-if="newViolation.studentId" class="mt-2">
+                    <p>
+                      Scanned Student ID: <strong>{{ newViolation.studentId }}</strong>
+                    </p>
+                  </div>
 
                   <!-- Violation Type Select -->
                   <v-select
