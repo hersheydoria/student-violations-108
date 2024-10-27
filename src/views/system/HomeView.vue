@@ -1,4 +1,5 @@
 <script setup>
+import { onMounted } from 'vue'
 import AppLayout from '@/components/layout/AppLayout.vue'
 import { useViolationRecords } from '@/stores/useViolationRecords'
 import { QrcodeStream } from 'vue3-qrcode-reader'
@@ -23,13 +24,17 @@ const {
   showQrScanner,
   showStudentInfoModal,
   selectedStudent,
-  user,
+  fetchViolations, // Fetch violations on mount
   onNameInput,
   showStudentDetails,
   onQrCodeScanned,
-  onInit,
   onError
 } = useViolationRecords()
+
+// Fetch violations on component mount
+onMounted(() => {
+  fetchViolations()
+})
 </script>
 
 <template>

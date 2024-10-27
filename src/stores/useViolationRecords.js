@@ -1,6 +1,12 @@
-import { ref } from 'vue'
+/* eslint-env node */
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { watch } from 'vue'
+import axios from 'axios'
+
+// Supabase API configuration
+const SUPABASE_URL = 'https://xmsncfnqrihsbbeljjfp.supabase.co'
+const SUPABASE_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhtc25jZm5xcmloc2JiZWxqamZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwOTg1NDEsImV4cCI6MjA0MzY3NDU0MX0.x5gbs9Pl4NN371dJUwanApAal64YuWjV9gpUFkyqGtg'
 
 export function useViolationRecords() {
   const router = useRouter()
@@ -12,40 +18,12 @@ export function useViolationRecords() {
   const valid = ref(false)
   const selectedMethod = ref('idNumber')
   const showQrScanner = ref(false)
-
-  // State for controlling the student info modal
   const showStudentInfoModal = ref(false)
   const selectedStudent = ref({})
+  const students = ref([])
+  const violations = ref([])
+  const history = ref([])
 
-  // Predefined student details (replace with API call if needed)
-  const students = [
-    {
-      id: '221-00414',
-      name: 'John Doe',
-      picture: 'hershey.jpeg',
-      address: '1234 Elm Street',
-      birthday: '2000-01-01',
-      programYear: 'BS Computer Science, 3rd Year'
-    }
-    // Add more student objects as needed
-  ]
-
-  // Violation form data
-  const newViolation = ref({
-    studentId: '',
-    studentName: '',
-    qrCode: '',
-    type: ''
-  })
-  watch(
-    () => newViolation.value.studentId,
-    (newValue) => {
-      console.log('New Student ID:', newValue) // Log to see if it changes
-    }
-  )
-
-  const violations = ref([]) // Current violation data
-  const history = ref([]) // History of violations
   const headers = [
     { text: 'Student ID', value: 'studentId' },
     { text: 'Violation Type', value: 'type' },
@@ -55,7 +33,6 @@ export function useViolationRecords() {
     { text: 'Action', value: 'action', sortable: false }
   ]
 
-  // Alphabetically sorted violation types
   const violationTypes = [
     'Abuse Code Ceremony',
     'Blocking Publication',
@@ -70,8 +47,32 @@ export function useViolationRecords() {
     'Violating Policies'
   ]
 
-  // Methods
-  const addViolation = () => {
+  const newViolation = ref({
+    studentId: '',
+    studentName: '',
+    qrCode: '',
+    type: ''
+  })
+
+  // Fetch students from Supabase
+  const fetchStudents = async () => {
+    try {
+      const { data } = await axios.get(`${SUPABASE_URL}/rest/v1/students`, {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`
+        }
+      })
+      students.value = data
+    } catch (error) {
+      console.error('Error fetching students:', error)
+    }
+  }
+
+  // Fetch students on component mount
+  onMounted(fetchStudents)
+
+  const addViolation = async () => {
     const studentInfo =
       selectedMethod.value === 'idNumber'
         ? newViolation.value.studentId
@@ -84,16 +85,47 @@ export function useViolationRecords() {
       return
     }
 
-    violations.value.push({
-      id: violations.value.length + 1,
-      studentId: studentInfo,
-      type: newViolation.value.type,
-      date: new Date().toLocaleDateString(),
-      recordedBy: 'Guard',
+    const newViolationRecord = {
+      student_id: studentInfo,
+      violation_type: newViolation.value.type,
+      violation_date: new Date().toISOString(),
+      recorded_by: 'Guard', // Replace 'Guard' with actual user ID if available
       status: 'Blocked'
-    })
+    }
 
-    resetForm()
+    console.log('Violation Record Payload:', newViolationRecord) // Log payload
+
+    try {
+      const { data, error } = await axios.post(
+        `${SUPABASE_URL}/rest/v1/student_violations`,
+        newViolationRecord,
+        {
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation'
+          }
+        }
+      )
+
+      if (error) {
+        console.error('Supabase Error Details:', error.response?.data) // Log error details
+        alert('Failed to save the violation. Please try again.')
+        return
+      }
+
+      violations.value.push(data[0])
+      resetForm()
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        console.error('Error details:', err.response?.data || err.message)
+        alert('Failed to save the violation: ' + (err.response?.data.message || err.message))
+      } else {
+        console.error('Unexpected Error:', err)
+        alert('An unexpected error occurred. Please try again.')
+      }
+    }
   }
 
   const resetForm = () => {
@@ -102,6 +134,22 @@ export function useViolationRecords() {
     newViolation.value.qrCode = ''
     newViolation.value.type = ''
     showForm.value = false
+  }
+
+  const fetchViolations = async () => {
+    try {
+      const { data } = await axios.get(`${SUPABASE_URL}/rest/v1/student_violations`, {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`
+        }
+      })
+
+      violations.value = data
+    } catch (error) {
+      console.error('Error fetching violations:', error)
+      alert('Failed to fetch violations. Please try again.')
+    }
   }
 
   const unblockViolation = (violationId) => {
@@ -130,7 +178,9 @@ export function useViolationRecords() {
   const normalizeId = (id) => id.replace(/-/g, '').trim()
 
   const findStudentByName = () => {
-    const student = students.find((student) => student.name === newViolation.value.studentName)
+    const student = students.value.find(
+      (student) => student.name === newViolation.value.studentName
+    )
     if (student) {
       newViolation.value.studentId = normalizeId(student.id)
     } else {
@@ -143,20 +193,18 @@ export function useViolationRecords() {
   }
 
   const showStudentDetails = (studentId) => {
-    const student = students.find((s) => normalizeId(s.id) === normalizeId(studentId))
+    const student = students.value.find((s) => normalizeId(s.id) === normalizeId(studentId))
     if (student) {
       selectedStudent.value = student
       showStudentInfoModal.value = true
     }
   }
 
-  // QR Code Scanning Logic
   const onQrCodeScanned = (result) => {
     if (result) {
       console.log('QR Code Scanned Result:', result)
-      newViolation.value.studentId = result // Keep the hyphens
-      console.log('New Student ID:', newViolation.value.studentId) // Should show 221-00414
-      showQrScanner.value = false // Close the scanner
+      newViolation.value.studentId = result
+      showQrScanner.value = false
     }
   }
 
@@ -189,6 +237,7 @@ export function useViolationRecords() {
     onNameInput,
     showStudentDetails,
     onQrCodeScanned,
-    onError
+    onError,
+    fetchViolations
   }
 }
