@@ -1,10 +1,15 @@
 <script setup>
 import { ref } from 'vue'
-//import { supabase } from './supabase' // Import Supabase client
 import { useRouter } from 'vue-router'
+import { createClient } from '@supabase/supabase-js' // Import Supabase client
+
+const SUPABASE_URL = 'https://xmsncfnqrihsbbeljjfp.supabase.co'
+const SUPABASE_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhtc25jZm5xcmloc2JiZWxqamZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwOTg1NDEsImV4cCI6MjA0MzY3NDU0MX0.x5gbs9Pl4NN371dJUwanApAal64YuWjV9gpUFkyqGtg'
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 // Form data
-const userId = ref('')
+const idNumber = ref('')
 const password = ref('')
 const valid = ref(true)
 
@@ -18,7 +23,6 @@ const errorMessage = ref('')
 const rules = {
   required: (value) => !!value || 'Required.',
   passwordMin: (v) => v.length >= 5 || 'Password must be at least 5 characters long',
-  passwordMatch: (v) => v === email.value || 'Passwords must match',
   email: (value) => /.+@.+\..+/.test(value) || 'E-mail must be valid.'
 }
 
@@ -26,11 +30,37 @@ const rules = {
 const router = useRouter()
 
 // Login logic
-function onLogin() {
+async function onLogin() {
   if (valid.value) {
-    console.log('User ID:', userId.value)
-    console.log('Password:', password.value)
-    router.push('/home')
+    try {
+      // Step 1: Retrieve the email from Supabase based on user id
+      const { data: user, error: fetchError } = await supabase
+        .from('auth.users')
+        .select('email')
+        .eq('id', idNumber.value) // Match based on 'id' field in auth.users
+        .single()
+
+      if (fetchError || !user) {
+        errorMessage.value = 'Invalid ID number or user not found'
+        return
+      }
+
+      // Step 2: Use the retrieved email to sign in with password
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: password.value
+      })
+
+      if (signInError) {
+        errorMessage.value = 'Invalid login credentials'
+        return
+      }
+
+      // Redirect on successful login
+      router.push('/home')
+    } catch (error) {
+      errorMessage.value = 'An unexpected error occurred'
+    }
   } else {
     console.log('Invalid form')
   }
@@ -45,7 +75,7 @@ function onForgotPassword() {
 async function onResetPassword() {
   if (valid.value) {
     try {
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email.value, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
         redirectTo: 'http://localhost:3000/reset-password' // URL for the reset page
       })
 
@@ -64,11 +94,11 @@ async function onResetPassword() {
 
 <template>
   <v-form v-model="valid" lazy-validation>
-    <!-- User ID field -->
+    <!-- ID Number field -->
     <v-text-field
-      v-model="userId"
+      v-model="idNumber"
       :rules="[rules.required]"
-      label="User ID"
+      label="ID Number"
       prepend-icon="mdi-account"
       required
     ></v-text-field>
@@ -108,7 +138,6 @@ async function onResetPassword() {
           Forgot Password?
         </span>
       </v-col>
-      <!-- Add a spacer to push the Forgot Password link to the right -->
       <v-spacer></v-spacer>
       <v-col class="text-right">
         <v-btn
@@ -131,7 +160,6 @@ async function onResetPassword() {
       <v-card class="px-6 py-6" elevation="12" rounded="xl" style="background-color: #e6ffb1">
         <v-card-title class="headline"><strong>Reset Password</strong></v-card-title>
         <v-card-text>
-          <!-- Enter email for password reset -->
           <v-form v-model="valid" lazy-validation>
             <v-text-field
               v-model="email"
@@ -142,12 +170,10 @@ async function onResetPassword() {
             ></v-text-field>
           </v-form>
 
-          <!-- Show success message if the email has been sent -->
           <v-alert v-if="emailSent" type="success" class="mt-4">
             A password reset link has been sent to your email.
           </v-alert>
 
-          <!-- Show error message if there was an error -->
           <v-alert v-if="errorMessage" type="error" class="mt-4">
             {{ errorMessage }}
           </v-alert>
