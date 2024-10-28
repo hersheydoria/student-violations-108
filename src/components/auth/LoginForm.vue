@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { createClient } from '@supabase/supabase-js' // Import Supabase client
+import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = 'https://xmsncfnqrihsbbeljjfp.supabase.co'
 const SUPABASE_KEY =
@@ -9,13 +9,13 @@ const SUPABASE_KEY =
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 // Form data
-const idNumber = ref('')
+const email = ref('')
 const password = ref('')
 const valid = ref(true)
 
 // Forgot Password modal
 const forgotPasswordDialog = ref(false)
-const email = ref('') // Email for password reset
+const emailForReset = ref('') // Email for password reset
 const emailSent = ref(false)
 const errorMessage = ref('')
 
@@ -31,26 +31,22 @@ const router = useRouter()
 
 // Login logic
 async function onLogin() {
+  errorMessage.value = '' // Reset error message
+
+  // Check if the form is valid
   if (valid.value) {
+    // Log email and password to check values before making the login request
+    console.log('Email:', email.value)
+    console.log('Password:', password.value)
+
     try {
-      // Step 1: Retrieve the email from Supabase based on user id
-      const { data: user, error: fetchError } = await supabase
-        .from('auth.users')
-        .select('email')
-        .eq('id', idNumber.value) // Match based on 'id' field in auth.users
-        .single()
-
-      if (fetchError || !user) {
-        errorMessage.value = 'Invalid ID number or user not found'
-        return
-      }
-
-      // Step 2: Use the retrieved email to sign in with password
+      // Attempt to log in with Supabase
       const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: user.email,
+        email: email.value,
         password: password.value
       })
 
+      // Handle login error
       if (signInError) {
         errorMessage.value = 'Invalid login credentials'
         return
@@ -75,7 +71,7 @@ function onForgotPassword() {
 async function onResetPassword() {
   if (valid.value) {
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.value, {
+      const { error } = await supabase.auth.resetPasswordForEmail(emailForReset.value, {
         redirectTo: 'http://localhost:3000/reset-password' // URL for the reset page
       })
 
@@ -94,12 +90,12 @@ async function onResetPassword() {
 
 <template>
   <v-form v-model="valid" lazy-validation>
-    <!-- ID Number field -->
+    <!-- Email field -->
     <v-text-field
-      v-model="idNumber"
-      :rules="[rules.required]"
-      label="ID Number"
-      prepend-icon="mdi-account"
+      v-model="email"
+      :rules="[rules.required, rules.email]"
+      label="Email"
+      prepend-icon="mdi-email"
       required
     ></v-text-field>
 
@@ -162,7 +158,7 @@ async function onResetPassword() {
         <v-card-text>
           <v-form v-model="valid" lazy-validation>
             <v-text-field
-              v-model="email"
+              v-model="emailForReset"
               :rules="[rules.required, rules.email]"
               label="Email"
               prepend-icon="mdi-email"

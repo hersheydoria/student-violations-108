@@ -2,14 +2,14 @@ import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = 'https://xmsncfnqrihsbbeljjfp.supabase.co'
 const SUPABASE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhtc25jZm5xcmloc2JiZWxqamZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwOTg1NDEsImV4cCI6MjA0MzY3NDU0MX0.x5gbs9Pl4NN371dJUwanApAal64YuWjV9gpUFkyqGtg'
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhtc25jZm5xcmloc2JiZWxqamZwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODA5ODU0MSwiZXhwIjoyMDQzNjc0NTQxfQ.fM4fI7DZCZt9rVG9469M8aiKZja_5Pdzfx-y5rQkZ_4'
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 export const guardsInfo = async () => {
   const guards = [
     {
       id_number: '123-456',
-      email: 'hershey.doria@carsu.edu.ph',
+      email: 'hershey.doria+1@carsu.edu.ph',
       password: 'hershey',
       first_name: 'John',
       last_name: 'Doe',
@@ -17,7 +17,7 @@ export const guardsInfo = async () => {
     },
     {
       id_number: '234-567',
-      email: 'may.estroga@carsu.edu.ph',
+      email: 'may.estroga+2@carsu.edu.ph',
       password: 'estroga',
       first_name: 'Jane',
       last_name: 'Smith',
@@ -25,7 +25,7 @@ export const guardsInfo = async () => {
     },
     {
       id_number: '345-678',
-      email: 'rovannah.delola@carsu.edu.ph',
+      email: 'rovannah.delola+3@carsu.edu.ph',
       password: 'rovannah',
       first_name: 'Alice',
       last_name: 'Johnson',
@@ -46,7 +46,24 @@ export const guardsInfo = async () => {
         continue // Skip to the next guard if there's an error
       }
 
-      // Step 2: Update user metadata in auth.users
+      console.log('User created:', authData.user.id)
+
+      // Step 2: Sign in the user to establish a session
+      const {
+        user,
+        session,
+        error: signInError
+      } = await supabase.auth.signIn({
+        email: guard.email,
+        password: guard.password
+      })
+
+      if (signInError) {
+        console.error('Error signing in user:', signInError.message)
+        continue // Skip to the next guard if there's an error
+      }
+
+      // Step 3: Update user metadata in auth.users
       const { error: metadataError } = await supabase.auth.updateUser({
         data: {
           id_number: guard.id_number,
