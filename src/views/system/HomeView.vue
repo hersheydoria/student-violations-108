@@ -28,7 +28,8 @@ const {
   onNameInput,
   showStudentDetails,
   onQrCodeScanned,
-  onError
+  onError,
+  user
 } = useViolationRecords()
 
 // Fetch violations on component mount
@@ -65,20 +66,25 @@ onMounted(() => {
               <v-img src="account.jpg" alt="Profile Picture" />
             </v-avatar>
           </v-list-item>
-          <v-list-item>
-            <p><strong>ID Number:</strong> {{ user?.idNumber || 'N/A' }}</p>
+          <v-list-item v-if="user">
+            <p><strong>ID Number:</strong> {{ user.idNumber }}</p>
           </v-list-item>
-          <v-list-item>
-            <p><strong>Name:</strong> {{ user?.name || 'N/A' }}</p>
+          <v-list-item v-if="user">
+            <p><strong>Name:</strong> {{ user.fullname }}</p>
           </v-list-item>
-          <v-list-item>
-            <p><strong>Email:</strong> {{ user?.email || 'N/A' }}</p>
+          <v-list-item v-if="user">
+            <p><strong>Email:</strong> {{ user.email }}</p>
           </v-list-item>
-          <v-list-item>
-            <p><strong>Role:</strong> {{ user?.role || 'N/A' }}</p>
+          <v-list-item v-if="user">
+            <p><strong>Role:</strong> {{ user.role }}</p>
           </v-list-item>
-          <v-divider></v-divider>
-          <v-list-item @click="logout">Logout</v-list-item>
+          <v-list-item v-if="user">
+            <v-divider></v-divider>
+            <v-list-item @click="logout">Logout</v-list-item>
+          </v-list-item>
+          <v-list-item v-else>
+            <p>No user currently signed in.</p>
+          </v-list-item>
         </v-list>
       </v-navigation-drawer>
 
@@ -123,9 +129,8 @@ onMounted(() => {
                 </template>
 
                 <template v-slot:item.studentId="{ item }">
-                  <v-btn @click="showStudentDetails(item.studentId)" text color="green">
-                    {{ item.studentId || newViolation.studentId }}
-                    <!-- Ensure this line gets the correct ID -->
+                  <v-btn @click="showStudentDetails(item.student.id)" color="green">
+                    {{ item.student.idNumber || newViolation.student.idNumber }}
                   </v-btn>
                 </template>
 
@@ -136,6 +141,7 @@ onMounted(() => {
             </v-col>
           </v-row>
 
+          <!-- Student Info Modal -->
           <v-dialog
             v-model="showStudentInfoModal"
             max-width="600px"
@@ -152,7 +158,7 @@ onMounted(() => {
                     </v-avatar>
                   </v-col>
                   <v-col cols="12">
-                    <p><strong>Name:</strong> {{ selectedStudent.name }}</p>
+                    <p><strong>Name:</strong> {{ selectedStudent.fullname }}</p>
                     <p><strong>Address:</strong> {{ selectedStudent.address }}</p>
                     <p><strong>Birthday:</strong> {{ selectedStudent.birthday }}</p>
                     <p><strong>Program & Year:</strong> {{ selectedStudent.programYear }}</p>
@@ -177,14 +183,12 @@ onMounted(() => {
               <v-card-title class="headline"><strong>ADD VIOLATION</strong></v-card-title>
               <v-card-text>
                 <v-form v-model="valid" lazy-validation>
-                  <!-- Input method selection -->
                   <v-radio-group v-model="selectedMethod" label="Add Violation By">
                     <v-radio label="ID Number" value="idNumber" />
                     <v-radio label="Name" value="name" />
                     <v-radio label="QR Code" value="qrCode" />
                   </v-radio-group>
 
-                  <!-- Conditionally show input fields based on selected method -->
                   <v-text-field
                     v-if="selectedMethod === 'idNumber'"
                     label="ID Number"
@@ -202,7 +206,6 @@ onMounted(() => {
                     @input="onNameInput"
                   ></v-text-field>
 
-                  <!-- QR Code Scanner button -->
                   <v-btn
                     v-if="selectedMethod === 'qrCode'"
                     @click="showQrScanner = true"
@@ -211,14 +214,12 @@ onMounted(() => {
                   >
                     Open QR Code Scanner
                   </v-btn>
-                  <!-- Display scanned ID if it exists -->
                   <div v-if="newViolation.studentId" class="mt-2">
                     <p>
                       Scanned Student ID: <strong>{{ newViolation.studentId }}</strong>
                     </p>
                   </div>
 
-                  <!-- Violation Type Select -->
                   <v-select
                     label="Violation Type"
                     v-model="newViolation.type"
@@ -245,7 +246,7 @@ onMounted(() => {
             <v-card class="px-6 py-6" elevation="12" rounded="xl" style="background-color: #e6ffb1">
               <v-card-title>Scan QR Code</v-card-title>
               <v-card-text>
-                <QrcodeStream @decode="onQrCodeScanned" @init="onInit" @error="onError" />
+                <QrcodeStream @decode="onQrCodeScanned" @error="onError" />
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -254,15 +255,15 @@ onMounted(() => {
             </v-card>
           </v-dialog>
 
-          <!-- View History Modal -->
+          <!-- Violation History -->
           <v-dialog
             v-model="showViewHistory"
-            max-width="600px"
+            max-width="800px"
             elevation="10"
             style="backdrop-filter: blur(8px)"
           >
             <v-card class="px-6 py-6" elevation="12" rounded="xl" style="background-color: #e6ffb1">
-              <v-card-title class="headline"><strong>HISTORY</strong></v-card-title>
+              <v-card-title class="headline">Violation History</v-card-title>
               <v-card-text>
                 <v-data-table
                   :headers="headers"
@@ -270,13 +271,12 @@ onMounted(() => {
                   item-value="id"
                   class="mt-5"
                   :footer-props="{ 'items-per-page-options': [] }"
-                  style="background-color: transparent"
                 >
                 </v-data-table>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn @click="showViewHistory = false" color="customGreen">Close</v-btn>
+                <v-btn @click="showViewHistory = false">Close</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -285,3 +285,11 @@ onMounted(() => {
     </AppLayout>
   </v-app>
 </template>
+
+<style scoped>
+.customGreen {
+  background-color: #286643;
+  color: white;
+  border: 2px solid #e6ffb1;
+}
+</style>

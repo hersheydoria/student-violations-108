@@ -1,22 +1,28 @@
 <script setup>
-/* eslint-env node */
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { createClient } from '@supabase/supabase-js'
-import 'dotenv/config'
 
-// Initialize Supabase client
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_SERVICE_KEY)
-// Form data
+// Initialize Supabase client with correct keys
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+)
+
+// Form data and states
 const email = ref('')
 const password = ref('')
 const valid = ref(true)
+const loading = ref(false)
+const errorMessage = ref('')
 
 // Forgot Password modal
 const forgotPasswordDialog = ref(false)
 const emailForReset = ref('') // Email for password reset
 const emailSent = ref(false)
-const errorMessage = ref('')
+
+// Router instance
+const router = useRouter()
 
 // Validation rules
 const rules = {
@@ -25,40 +31,56 @@ const rules = {
   email: (value) => /.+@.+\..+/.test(value) || 'E-mail must be valid.'
 }
 
-// Router instance
-const router = useRouter()
+// Mounted lifecycle to check session status
+onMounted(async () => {
+  const {
+    data: { session }
+  } = await supabase.auth.getSession()
 
-// Login logic
+  if (session && session.user) {
+    router.push('/home')
+  }
+
+  // Listen for auth state changes
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session?.user) {
+      localStorage.setItem('authUser', JSON.stringify(session.user))
+      router.push('/home')
+    } else if (event === 'SIGNED_OUT') {
+      localStorage.removeItem('authUser')
+    }
+  })
+})
+
+// Login function
 async function onLogin() {
-  errorMessage.value = '' // Reset error message
+  errorMessage.value = ''
+  loading.value = true
 
-  // Check if the form is valid
   if (valid.value) {
-    // Log email and password to check values before making the login request
-    console.log('Email:', email.value)
-    console.log('Password:', password.value)
-
     try {
-      // Attempt to log in with Supabase
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email: email.value,
         password: password.value
       })
 
-      // Handle login error
-      if (signInError) {
+      if (error) {
         errorMessage.value = 'Invalid login credentials'
-        return
-      }
+        console.error('Login error:', error.message)
+      } else {
+        console.log('Access Token:', data.session.access_token)
 
-      // Redirect on successful login
-      router.push('/home')
+        router.push('/home')
+      }
     } catch (error) {
       errorMessage.value = 'An unexpected error occurred'
+      console.error('Unexpected error:', error)
     }
   } else {
     console.log('Invalid form')
   }
+
+  loading.value = false
 }
 
 // Open Forgot Password modal
@@ -66,12 +88,12 @@ function onForgotPassword() {
   forgotPasswordDialog.value = true
 }
 
-// Reset password logic using Supabase
+// Reset password function
 async function onResetPassword() {
   if (valid.value) {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(emailForReset.value, {
-        redirectTo: 'http://localhost:3000/reset-password' // URL for the reset page
+        redirectTo: 'http://localhost:3000/reset-password'
       })
 
       if (error) {
@@ -79,9 +101,10 @@ async function onResetPassword() {
       }
 
       emailSent.value = true
-      forgotPasswordDialog.value = false // Close modal after success
+      forgotPasswordDialog.value = false
     } catch (error) {
       errorMessage.value = error.message
+      console.error('Password reset error:', error)
     }
   }
 }
@@ -136,6 +159,7 @@ async function onResetPassword() {
       <v-spacer></v-spacer>
       <v-col class="text-right">
         <v-btn
+          :loading="loading"
           color="customGreen"
           @click="onLogin"
           style="width: 90px; height: 40px; font-size: 18px"

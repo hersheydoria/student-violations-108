@@ -1,6 +1,6 @@
-/* eslint-env node */
+/* global process */
 import { createClient } from '@supabase/supabase-js'
-import 'dotenv/config'
+import 'dotenv/config' // Load environment variables from .env file
 
 // Initialize Supabase client
 const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_SERVICE_KEY)
@@ -9,7 +9,7 @@ export const guardsInfo = async () => {
   const guards = [
     {
       id_number: '123-456',
-      email: 'hershey.doria+1@carsu.edu.ph',
+      email: 'hershey.doria@carsu.edu.ph',
       password: 'hershey',
       first_name: 'John',
       last_name: 'Doe',
@@ -17,7 +17,7 @@ export const guardsInfo = async () => {
     },
     {
       id_number: '234-567',
-      email: 'may.estroga+2@carsu.edu.ph',
+      email: 'may.estroga@carsu.edu.ph',
       password: 'estroga',
       first_name: 'Jane',
       last_name: 'Smith',
@@ -25,7 +25,7 @@ export const guardsInfo = async () => {
     },
     {
       id_number: '345-678',
-      email: 'rovannah.delola+3@carsu.edu.ph',
+      email: 'rovannah.delola@carsu.edu.ph',
       password: 'rovannah',
       first_name: 'Alice',
       last_name: 'Johnson',
@@ -35,51 +35,32 @@ export const guardsInfo = async () => {
 
   for (const guard of guards) {
     try {
-      // Step 1: Sign up the user in Supabase Auth
+      // Step 1: Create user in Supabase Auth with custom metadata
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: guard.email,
-        password: guard.password
-      })
-
-      if (authError) {
-        console.error('Error creating user:', authError.message)
-        continue // Skip to the next guard if there's an error
-      }
-
-      console.log('User created:', authData.user.id)
-
-      // Step 2: Sign in the user to establish a session
-      const {
-        user,
-        session,
-        error: signInError
-      } = await supabase.auth.signIn({
-        email: guard.email,
-        password: guard.password
-      })
-
-      if (signInError) {
-        console.error('Error signing in user:', signInError.message)
-        continue // Skip to the next guard if there's an error
-      }
-
-      // Step 3: Update user metadata in auth.users
-      const { error: metadataError } = await supabase.auth.updateUser({
-        data: {
-          id_number: guard.id_number,
-          first_name: guard.first_name,
-          last_name: guard.last_name,
-          role: guard.role
+        password: guard.password,
+        options: {
+          data: {
+            id_number: guard.id_number,
+            first_name: guard.first_name,
+            last_name: guard.last_name,
+            role: guard.role,
+            aud: 'authenticated' // Sets the audience/role as authenticated
+          }
         }
       })
 
-      if (metadataError) {
-        console.error('Error updating user metadata:', metadataError.message)
-      } else {
-        console.log('Guard profile created successfully:', authData.user.id)
+      if (authError) {
+        console.error(`Error creating new user for ${guard.email}:`, authError)
+        continue
       }
+
+      console.log(`New user created: ${guard.email} (ID: ${authData.user?.id})`)
     } catch (error) {
       console.error('Unexpected error:', error)
     }
   }
 }
+
+// Run the function to check for issues
+guardsInfo()

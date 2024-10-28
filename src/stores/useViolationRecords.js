@@ -1,12 +1,14 @@
-/* eslint-env node */
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import 'dotenv/config'
+import { createClient } from '@supabase/supabase-js'
+import { v4 as uuidv4 } from 'uuid'
 
-// Supabase API configuration
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL
-const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+// Initialize Supabase client
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
 
 export function useViolationRecords() {
   const router = useRouter()
@@ -23,6 +25,7 @@ export function useViolationRecords() {
   const students = ref([])
   const violations = ref([])
   const history = ref([])
+  const user = ref(null)
 
   const headers = [
     { text: 'Student ID', value: 'studentId' },
@@ -54,8 +57,10 @@ export function useViolationRecords() {
     type: ''
   })
 
-  // Fetch students from Supabase
+  const loading = ref(false)
+
   const fetchStudents = async () => {
+    loading.value = true
     try {
       const { data } = await axios.get(`${SUPABASE_URL}/rest/v1/students`, {
         headers: {
@@ -63,37 +68,74 @@ export function useViolationRecords() {
           Authorization: `Bearer ${SUPABASE_KEY}`
         }
       })
-      students.value = data
+
+      // Assuming `data` is an array of students from Supabase
+      students.value = data.map((student) => ({
+        fullname: `${student.first_name} ${student.last_name}`,
+        idNumber: student.student_number,
+        date: student.created_at,
+        address: student.adress,
+        birthday: student.birthday
+      }))
+
+      console.log('Fetched students:', students.value) // Log the fetched data
     } catch (error) {
       console.error('Error fetching students:', error)
+      alert('Failed to fetch students. Please try again.')
+    } finally {
+      loading.value = false
     }
   }
 
-  // Fetch students on component mount
-  onMounted(fetchStudents)
+  // Getting User Information Functionality
+  const getUser = async () => {
+    const {
+      data: {
+        user: { user_metadata: metadata }
+      }
+    } = await supabase.auth.getUser()
+
+    if (metadata) {
+      user.value = {
+        email: metadata.email,
+        fullname: `${metadata.first_name} ${metadata.last_name}`,
+        idNumber: metadata.id_number,
+        role: metadata.role
+      }
+    }
+  }
+
+  // Fetch students and user data on component mount
+  onMounted(() => {
+    fetchStudents()
+    getUser() // Call getUser on mount to fetch the authenticated user info
+  })
 
   const addViolation = async () => {
     const studentInfo =
       selectedMethod.value === 'idNumber'
         ? newViolation.value.studentId
-        : selectedMethod.value === 'name'
-          ? newViolation.value.studentName
-          : newViolation.value.studentId
+        : newViolation.value.studentName
 
     if (!studentInfo || !newViolation.value.type) {
       alert('Please provide both Student Info and Violation Type.')
       return
     }
 
+    const guardId = user.value?.email || 'Unknown'
+    if (!guardId) {
+      alert('No user is currently signed in.')
+      return
+    }
+
     const newViolationRecord = {
+      id: uuidv4(),
       student_id: studentInfo,
       violation_type: newViolation.value.type,
       violation_date: new Date().toISOString(),
-      recorded_by: 'Guard', // Replace 'Guard' with actual user ID if available
+      recorded_by: guardId,
       status: 'Blocked'
     }
-
-    console.log('Violation Record Payload:', newViolationRecord) // Log payload
 
     try {
       const { data, error } = await axios.post(
@@ -110,7 +152,7 @@ export function useViolationRecords() {
       )
 
       if (error) {
-        console.error('Supabase Error Details:', error.response?.data) // Log error details
+        console.error('Supabase Error Details:', error.response?.data)
         alert('Failed to save the violation. Please try again.')
         return
       }
@@ -118,13 +160,8 @@ export function useViolationRecords() {
       violations.value.push(data[0])
       resetForm()
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        console.error('Error details:', err.response?.data || err.message)
-        alert('Failed to save the violation: ' + (err.response?.data.message || err.message))
-      } else {
-        console.error('Unexpected Error:', err)
-        alert('An unexpected error occurred. Please try again.')
-      }
+      console.error('Error details:', err.response?.data || err.message)
+      alert('Failed to save the violation: ' + (err.response?.data.message || err.message))
     }
   }
 
@@ -162,9 +199,17 @@ export function useViolationRecords() {
     }
   }
 
-  const logout = () => {
-    localStorage.removeItem('authToken')
-    router.push('/login')
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut()
+      localStorage.removeItem('authUser')
+      user.value = null
+      router.push('/login')
+      alert('You have successfully logged out.')
+    } catch (error) {
+      console.error('Error during logout:', error)
+      alert('Failed to log out. Please try again.')
+    }
   }
 
   const toggleViewHistory = () => {
@@ -174,8 +219,6 @@ export function useViolationRecords() {
   const toggleLeftSidebar = () => {
     showLeftSidebar.value = !showLeftSidebar.value
   }
-
-  const normalizeId = (id) => id.replace(/-/g, '').trim()
 
   const findStudentByName = () => {
     const student = students.value.find(
@@ -192,11 +235,28 @@ export function useViolationRecords() {
     findStudentByName()
   }
 
+  const normalizeId = (id) => {
+    if (typeof id !== 'string') {
+      console.warn('normalizeId received a non-string value:', id)
+      return '' // Return an empty string or handle this case as needed
+    }
+    return id.replace(/-/g, '').trim()
+  }
+
   const showStudentDetails = (studentId) => {
-    const student = students.value.find((s) => normalizeId(s.id) === normalizeId(studentId))
+    console.log('Student ID passed to showStudentDetails:', studentId) // Log the received studentId
+    if (!studentId) {
+      console.warn('showStudentDetails called with an undefined or empty studentId')
+      return
+    }
+    const normalizedId = normalizeId(studentId)
+    const student = students.value.find((s) => normalizeId(s.id) === normalizedId)
+
     if (student) {
       selectedStudent.value = student
       showStudentInfoModal.value = true
+    } else {
+      console.warn('Student not found for ID:', normalizedId)
     }
   }
 
@@ -227,6 +287,7 @@ export function useViolationRecords() {
     history,
     headers,
     violationTypes,
+    user,
     addViolation,
     resetForm,
     unblockViolation,
