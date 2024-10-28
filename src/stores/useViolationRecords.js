@@ -2,11 +2,11 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import 'dotenv/config'
 
 // Supabase API configuration
-const SUPABASE_URL = 'https://xmsncfnqrihsbbeljjfp.supabase.co'
-const SUPABASE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhtc25jZm5xcmloc2JiZWxqamZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwOTg1NDEsImV4cCI6MjA0MzY3NDU0MX0.x5gbs9Pl4NN371dJUwanApAal64YuWjV9gpUFkyqGtg'
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL
+const SUPABASE_KEY = process.env.VITE_SUPABASE_ANON_KEY
 
 export function useViolationRecords() {
   const router = useRouter()

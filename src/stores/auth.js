@@ -1,9 +1,9 @@
+/* eslint-env node */
 import { createClient } from '@supabase/supabase-js'
+import 'dotenv/config'
 
-const SUPABASE_URL = 'https://xmsncfnqrihsbbeljjfp.supabase.co'
-const SUPABASE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhtc25jZm5xcmloc2JiZWxqamZwIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyODA5ODU0MSwiZXhwIjoyMDQzNjc0NTQxfQ.fM4fI7DZCZt9rVG9469M8aiKZja_5Pdzfx-y5rQkZ_4'
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+// Initialize Supabase client
+const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_SERVICE_KEY)
 
 export const guardsInfo = async () => {
   const guards = [

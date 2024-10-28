@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 import 'dotenv/config'
 
 // Initialize Supabase client
-const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_KEY)
+const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_ANON_KEY)
 
 const apiURL = 'https://fakerapi.it/api/v2/persons?_quantity=10'
 

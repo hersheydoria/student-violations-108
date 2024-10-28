@@ -1,13 +1,12 @@
 <script setup>
+/* eslint-env node */
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { createClient } from '@supabase/supabase-js'
+import 'dotenv/config'
 
-const SUPABASE_URL = 'https://xmsncfnqrihsbbeljjfp.supabase.co'
-const SUPABASE_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhtc25jZm5xcmloc2JiZWxqamZwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwOTg1NDEsImV4cCI6MjA0MzY3NDU0MX0.x5gbs9Pl4NN371dJUwanApAal64YuWjV9gpUFkyqGtg'
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
-
+// Initialize Supabase client
+const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.VITE_SUPABASE_SERVICE_KEY)
 // Form data
 const email = ref('')
 const password = ref('')
