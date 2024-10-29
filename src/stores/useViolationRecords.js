@@ -26,6 +26,7 @@ export function useViolationRecords() {
   const violations = ref([])
   const history = ref([])
   const user = ref(null)
+  const loading = ref(false)
 
   const headers = [
     { text: 'Student ID', value: 'studentId' },
@@ -56,8 +57,101 @@ export function useViolationRecords() {
     qrCode: '',
     type: ''
   })
+  const fetchViolations = async () => {
+    loading.value = true
+    try {
+      // Fetch student violations
+      const { data } = await axios.get(`${SUPABASE_URL}/rest/v1/student_violations`, {
+        headers: {
+          apikey: SUPABASE_KEY,
+          Authorization: `Bearer ${SUPABASE_KEY}`
+        },
+        params: {
+          select: `
+            id,
+            violation_type,
+            violation_date,
+            status,
+            recorded_by,
+            student_id
+          `
+        }
+      })
 
-  const loading = ref(false)
+      // Extract unique guard and student IDs
+      const guardIds = [...new Set(data.map((violation) => violation.recorded_by))]
+      const studentIds = [...new Set(data.map((violation) => violation.student_id))]
+
+      const guardsMap = {}
+      const studentsMap = {}
+
+      // Fetch guard details
+      for (const guardId of guardIds) {
+        const guardUser = await getUserById(guardId)
+        if (guardUser) {
+          guardsMap[guardId] = guardUser
+        }
+      }
+
+      // Fetch student details
+      for (const studentId of studentIds) {
+        const student = await getStudentByStudentId(studentId)
+        if (student) {
+          studentsMap[studentId] = student.student_number
+        }
+      }
+
+      // Map violations with guard names and student numbers
+      violations.value = data.map((violation) => ({
+        id: violation.id,
+        violationType: violation.violation_type,
+        violationDate: violation.violation_date,
+        status: violation.status,
+        recordedBy: violation.recorded_by,
+        studentId: violation.student_id,
+        guardFullName: guardsMap[violation.recorded_by]
+          ? `${guardsMap[violation.recorded_by].first_name || 'Unknown'} ${guardsMap[violation.recorded_by].last_name || ''}`
+          : 'Unknown Guard',
+        studentNumber: studentsMap[violation.student_id] || 'Unknown'
+      }))
+
+      console.log('Student violations data with guard names and student numbers:', violations.value)
+      return violations.value
+    } catch (error) {
+      console.error(
+        'Unexpected error fetching student violations with guard names and student numbers:',
+        error
+      )
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const getStudentByStudentId = async (studentId) => {
+    const { data, error } = await supabase
+      .from('students') // Ensure this matches your students table name
+      .select('student_number')
+      .eq('student_number', studentId) // Match studentId to student_number
+      .single() // Fetch a single student record
+
+    if (error) {
+      console.error(`Error fetching student data for student number: ${studentId}`, error)
+      return null
+    }
+
+    return data
+  }
+
+  const getUserById = async (id) => {
+    const { data, error } = await supabase.rpc('get_user_metadata', { user_id: id })
+
+    if (error) {
+      console.error(`Error fetching guard data for ID: ${id}`, error)
+      return null
+    }
+
+    return data ? data[0] : null // Assuming data is an array with one result
+  }
 
   const fetchStudents = async () => {
     loading.value = true
@@ -69,21 +163,46 @@ export function useViolationRecords() {
         }
       })
 
-      // Assuming `data` is an array of students from Supabase
       students.value = data.map((student) => ({
+        id: student.id,
         fullname: `${student.first_name} ${student.last_name}`,
-        idNumber: student.student_number,
-        date: student.created_at,
-        address: student.adress,
-        birthday: student.birthday
+        student_number: student.student_number,
+        createdAt: student.created_at,
+        address: student.address,
+        birthday: student.birthday,
+        image: student.image,
+        program: student.program,
+        year: student.year
       }))
-
-      console.log('Fetched students:', students.value) // Log the fetched data
     } catch (error) {
       console.error('Error fetching students:', error)
       alert('Failed to fetch students. Please try again.')
     } finally {
       loading.value = false
+    }
+  }
+  const normalizeId = (id) => id?.replace(/-/g, '').trim() || ''
+
+  const showStudentDetails = (studentId) => {
+    console.log('Student ID passed to showStudentDetails:', studentId)
+
+    // Normalize the incoming studentId
+    const normalizedId = normalizeId(studentId)
+    console.log('Normalized Student ID:', normalizedId)
+
+    // Debug: log the normalized student IDs in students.value
+    const studentIds = students.value.map((s) => normalizeId(s.student_number))
+    console.log('Available Student IDs:', studentIds)
+
+    // Find student by normalized student number
+    const student = students.value.find((s) => normalizeId(s.student_number) === normalizedId)
+
+    if (student) {
+      selectedStudent.value = student
+      showStudentInfoModal.value = true
+    } else {
+      console.warn('Student not found for ID:', normalizedId)
+      alert(`Student with ID ${normalizedId} not found.`)
     }
   }
 
@@ -97,6 +216,7 @@ export function useViolationRecords() {
 
     if (metadata) {
       user.value = {
+        id: metadata.sub, // User UUID
         email: metadata.email,
         fullname: `${metadata.first_name} ${metadata.last_name}`,
         idNumber: metadata.id_number,
@@ -108,10 +228,13 @@ export function useViolationRecords() {
   // Fetch students and user data on component mount
   onMounted(() => {
     fetchStudents()
-    getUser() // Call getUser on mount to fetch the authenticated user info
+    fetchViolations() // Ensure violations are fetched on component mount
+    getUser()
   })
 
   const addViolation = async () => {
+    await getUser() // Ensure user data is fetched before proceeding
+
     const studentInfo =
       selectedMethod.value === 'idNumber'
         ? newViolation.value.studentId
@@ -122,18 +245,18 @@ export function useViolationRecords() {
       return
     }
 
-    const guardId = user.value?.email || 'Unknown'
-    if (!guardId) {
+    const guardId = user.value?.id || 'Unknown' // Use the UUID from auth.users
+    if (!guardId || guardId === 'Unknown') {
       alert('No user is currently signed in.')
       return
     }
 
     const newViolationRecord = {
       id: uuidv4(),
-      student_id: studentInfo,
-      violation_type: newViolation.value.type,
-      violation_date: new Date().toISOString(),
-      recorded_by: guardId,
+      studentNumber: studentInfo,
+      violationType: newViolation.value.type,
+      violationDate: new Date().toISOString(),
+      recorded_by: guardId, // UUID from auth.users
       status: 'Blocked'
     }
 
@@ -171,22 +294,6 @@ export function useViolationRecords() {
     newViolation.value.qrCode = ''
     newViolation.value.type = ''
     showForm.value = false
-  }
-
-  const fetchViolations = async () => {
-    try {
-      const { data } = await axios.get(`${SUPABASE_URL}/rest/v1/student_violations`, {
-        headers: {
-          apikey: SUPABASE_KEY,
-          Authorization: `Bearer ${SUPABASE_KEY}`
-        }
-      })
-
-      violations.value = data
-    } catch (error) {
-      console.error('Error fetching violations:', error)
-      alert('Failed to fetch violations. Please try again.')
-    }
   }
 
   const unblockViolation = (violationId) => {
@@ -233,31 +340,6 @@ export function useViolationRecords() {
 
   const onNameInput = () => {
     findStudentByName()
-  }
-
-  const normalizeId = (id) => {
-    if (typeof id !== 'string') {
-      console.warn('normalizeId received a non-string value:', id)
-      return '' // Return an empty string or handle this case as needed
-    }
-    return id.replace(/-/g, '').trim()
-  }
-
-  const showStudentDetails = (studentId) => {
-    console.log('Student ID passed to showStudentDetails:', studentId) // Log the received studentId
-    if (!studentId) {
-      console.warn('showStudentDetails called with an undefined or empty studentId')
-      return
-    }
-    const normalizedId = normalizeId(studentId)
-    const student = students.value.find((s) => normalizeId(s.id) === normalizedId)
-
-    if (student) {
-      selectedStudent.value = student
-      showStudentInfoModal.value = true
-    } else {
-      console.warn('Student not found for ID:', normalizedId)
-    }
   }
 
   const onQrCodeScanned = (result) => {

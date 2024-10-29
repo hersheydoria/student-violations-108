@@ -115,25 +115,58 @@ onMounted(() => {
           <v-row>
             <v-col cols="12">
               <v-data-table
-                :headers="headers"
+                :headers="[
+                  { text: 'Student ID', value: 'student_id' },
+                  { text: 'Violation Type', value: 'violation_type' },
+                  { text: 'Recorded By', value: 'guard_name' },
+                  { text: 'Date', value: 'violation_date' },
+                  { text: 'Status', value: 'status' },
+                  { text: 'Action', value: 'action', sortable: false }
+                ]"
                 :items="violations"
                 item-value="id"
                 class="mt-5"
                 :footer-props="{ 'items-per-page-options': [] }"
                 style="background-color: #e6ffb1"
               >
+                <!-- Top Slot for Title -->
                 <template #top>
                   <v-toolbar flat style="background-color: #e6ffb1">
                     <v-toolbar-title><strong>RECORDS</strong></v-toolbar-title>
                   </v-toolbar>
                 </template>
 
-                <template v-slot:item.studentId="{ item }">
-                  <v-btn @click="showStudentDetails(item.student.id)" color="green">
-                    {{ item.student.idNumber || newViolation.student.idNumber }}
-                  </v-btn>
+                <!-- Student ID Slot with Details -->
+                <template v-slot:item.student_id="{ item }">
+                  <span v-if="item.studentNumber">
+                    <v-btn @click="showStudentDetails(item.studentNumber)" color="green" text>
+                      {{ item.studentNumber }}
+                    </v-btn>
+                  </span>
+                  <span v-else>No Student Data</span>
                 </template>
 
+                <!-- Violation Type Slot -->
+                <template v-slot:item.violation_type="{ item }">
+                  <span>{{ item.violationType || 'No Violation Type' }}</span>
+                </template>
+
+                <!-- Guard Name Slot -->
+                <template v-slot:item.guard_name="{ item }">
+                  <span>{{ item.guardFullName || 'No Data' }}</span>
+                </template>
+
+                <!-- Date Slot -->
+                <template v-slot:item.violationDate="{ item }">
+                  <span>{{ item.violation_date || 'No Date' }}</span>
+                </template>
+
+                <!-- Status Slot -->
+                <template v-slot:item.status="{ item }">
+                  <span>{{ item.status || 'No Status' }}</span>
+                </template>
+
+                <!-- Slot for Action Button -->
                 <template v-slot:item.action="{ item }">
                   <v-btn @click="unblockViolation(item.id)" color="green">UNBLOCK</v-btn>
                 </template>
@@ -154,14 +187,15 @@ onMounted(() => {
                 <v-row>
                   <v-col cols="12" class="text-center">
                     <v-avatar size="100">
-                      <v-img :src="selectedStudent.picture" alt="Profile Picture" />
+                      <v-img :src="selectedStudent.image" alt="Profile Picture" />
                     </v-avatar>
                   </v-col>
                   <v-col cols="12">
                     <p><strong>Name:</strong> {{ selectedStudent.fullname }}</p>
                     <p><strong>Address:</strong> {{ selectedStudent.address }}</p>
                     <p><strong>Birthday:</strong> {{ selectedStudent.birthday }}</p>
-                    <p><strong>Program & Year:</strong> {{ selectedStudent.programYear }}</p>
+                    <p><strong>Program:</strong> {{ selectedStudent.program }}</p>
+                    <p><strong>Year:</strong> {{ selectedStudent.year }}</p>
                   </v-col>
                 </v-row>
               </v-card-text>
@@ -231,7 +265,14 @@ onMounted(() => {
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn @click="showForm = false" color="grey">Cancel</v-btn>
-                <v-btn @click="addViolation" :disabled="!valid" color="customGreen">Add</v-btn>
+                <v-alert v-if="error" type="error" dense>
+                  {{ error }}
+                </v-alert>
+
+                <v-btn :disabled="!valid || isLoading" @click="addViolation">
+                  <span v-if="isLoading">Adding...</span>
+                  <span v-else>Add</span>
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
