@@ -60,7 +60,7 @@ export function useViolationRecords() {
   const fetchViolations = async () => {
     loading.value = true
     try {
-      // Fetch student violations
+      // Fetch all student violations
       const { data } = await axios.get(`${SUPABASE_URL}/rest/v1/student_violations`, {
         headers: {
           apikey: SUPABASE_KEY,
@@ -78,7 +78,10 @@ export function useViolationRecords() {
         }
       })
 
-      // Extract unique guard and student IDs
+      // Separate blocked and unblocked violations
+      const blockedViolations = data.filter((violation) => violation.status !== 'Unblocked')
+      const unblockedViolations = data.filter((violation) => violation.status === 'Unblocked')
+
       const guardIds = [...new Set(data.map((violation) => violation.recorded_by))]
       const studentIds = [...new Set(data.map((violation) => violation.student_id))]
 
@@ -101,27 +104,38 @@ export function useViolationRecords() {
         }
       }
 
-      // Map violations with guard names and student numbers
-      violations.value = data.map((violation) => ({
+      // Map blocked violations with guard names and student numbers
+      violations.value = blockedViolations.map((violation) => ({
         id: violation.id,
-        violationType: violation.violation_type,
-        violationDate: violation.violation_date,
+        violation_type: violation.violation_type,
+        violation_date: violation.violation_date,
         status: violation.status,
-        recordedBy: violation.recorded_by,
+        recorded_by: violation.recorded_by,
         studentId: violation.student_id,
         guardFullName: guardsMap[violation.recorded_by]
           ? `${guardsMap[violation.recorded_by].first_name || 'Unknown'} ${guardsMap[violation.recorded_by].last_name || ''}`
           : 'Unknown Guard',
-        studentNumber: studentsMap[violation.student_id] || 'Unknown'
+        student_id: studentsMap[violation.student_id] || 'Unknown'
       }))
 
-      console.log('Student violations data with guard names and student numbers:', violations.value)
-      return violations.value
+      // Map unblocked violations directly to the history
+      history.value = unblockedViolations.map((violation) => ({
+        id: violation.id,
+        violation_type: violation.violation_type,
+        violation_date: violation.violation_date,
+        status: violation.status,
+        recorded_by: violation.recorded_by,
+        studentId: violation.student_id,
+        guardFullName: guardsMap[violation.recorded_by]
+          ? `${guardsMap[violation.recorded_by].first_name || 'Unknown'} ${guardsMap[violation.recorded_by].last_name || ''}`
+          : 'Unknown Guard',
+        student_id: studentsMap[violation.student_id] || 'Unknown'
+      }))
+
+      console.log('Blocked violations:', violations.value)
+      console.log('Unblocked violations (history):', history.value)
     } catch (error) {
-      console.error(
-        'Unexpected error fetching student violations with guard names and student numbers:',
-        error
-      )
+      console.error('Error fetching student violations:', error)
     } finally {
       loading.value = false
     }
@@ -253,9 +267,9 @@ export function useViolationRecords() {
 
     const newViolationRecord = {
       id: uuidv4(),
-      studentNumber: studentInfo,
-      violationType: newViolation.value.type,
-      violationDate: new Date().toISOString(),
+      student_id: studentInfo,
+      violation_type: newViolation.value.type,
+      violation_date: new Date().toISOString(),
       recorded_by: guardId, // UUID from auth.users
       status: 'Blocked'
     }
@@ -296,13 +310,45 @@ export function useViolationRecords() {
     showForm.value = false
   }
 
-  const unblockViolation = (violationId) => {
+  const unblockViolation = async (violationId) => {
+    // Find the index of the violation in the local array
     const index = violations.value.findIndex((v) => v.id === violationId)
-    if (index !== -1) {
-      const unblockedViolation = violations.value[index]
-      unblockedViolation.status = 'Unblocked'
+    if (index === -1) {
+      console.warn(`Violation with ID ${violationId} not found in local data.`)
+      return
+    }
+
+    // Locally update the status in the `violations` array
+    const unblockedViolation = { ...violations.value[index], status: 'Unblocked' }
+
+    try {
+      // Send a PATCH request to Supabase to update the status
+      const { data, error } = await axios.patch(
+        `${SUPABASE_URL}/rest/v1/student_violations?id=eq.${violationId}`,
+        { status: 'Unblocked' },
+        {
+          headers: {
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json',
+            Prefer: 'return=representation'
+          }
+        }
+      )
+
+      if (error) {
+        console.error('Failed to update violation in Supabase:', error.message)
+        alert('Failed to unblock the violation. Please try again.')
+        return
+      }
+
+      // Move the unblocked violation from `violations` to `history` in local state
       history.value.push(unblockedViolation)
       violations.value.splice(index, 1)
+      console.log(`Violation with ID ${violationId} has been unblocked.`)
+    } catch (err) {
+      console.error('Unexpected error while unblocking violation:', err.message)
+      alert('An unexpected error occurred while unblocking the violation.')
     }
   }
 

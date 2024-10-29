@@ -138,9 +138,9 @@ onMounted(() => {
 
                 <!-- Student ID Slot with Details -->
                 <template v-slot:item.student_id="{ item }">
-                  <span v-if="item.studentNumber">
-                    <v-btn @click="showStudentDetails(item.studentNumber)" color="green" text>
-                      {{ item.studentNumber }}
+                  <span v-if="item.student_id">
+                    <v-btn @click="showStudentDetails(item.student_id)" color="green" text>
+                      {{ item.student_id }}
                     </v-btn>
                   </span>
                   <span v-else>No Student Data</span>
@@ -148,7 +148,7 @@ onMounted(() => {
 
                 <!-- Violation Type Slot -->
                 <template v-slot:item.violation_type="{ item }">
-                  <span>{{ item.violationType || 'No Violation Type' }}</span>
+                  <span>{{ item.violation_type || 'No Violation Type' }}</span>
                 </template>
 
                 <!-- Guard Name Slot -->
@@ -307,12 +307,30 @@ onMounted(() => {
               <v-card-title class="headline">Violation History</v-card-title>
               <v-card-text>
                 <v-data-table
-                  :headers="headers"
+                  :headers="[
+                    { text: 'Student ID', value: 'student_id' },
+                    { text: 'Violation Type', value: 'violation_type' },
+                    { text: 'Recorded By', value: 'guard_name' },
+                    { text: 'Status', value: 'status' }
+                  ]"
                   :items="history"
                   item-value="id"
                   class="mt-5"
                   :footer-props="{ 'items-per-page-options': [] }"
                 >
+                  <!-- Student ID Slot with Details -->
+                  <template v-slot:item.student_id="{ item }">
+                    <span v-if="item.student_id">
+                      <v-btn @click="showStudentDetails(item.student_id)" color="green" text>
+                        {{ item.student_id }}
+                      </v-btn>
+                    </span>
+                    <span v-else>No Student Data</span>
+                  </template>
+                  <!-- Guard Name Slot -->
+                  <template v-slot:item.guard_name="{ item }">
+                    <span>{{ item.guardFullName || 'No Data' }}</span>
+                  </template>
                 </v-data-table>
               </v-card-text>
               <v-card-actions>

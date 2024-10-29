@@ -93,7 +93,7 @@ async function onResetPassword() {
   if (valid.value) {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(emailForReset.value, {
-        redirectTo: 'http://localhost:3000/reset-password'
+        redirectTo: 'http://student-violations.vercel.app/reset-password'
       })
 
       if (error) {
@@ -131,7 +131,12 @@ async function onResetPassword() {
       required
     ></v-text-field>
 
-    <!-- Add message below the form -->
+    <!-- Display error message below form if login fails -->
+    <v-alert v-if="errorMessage" type="error" class="mt-4">
+      {{ errorMessage }}
+    </v-alert>
+
+    <!-- Additional message -->
     <v-alert type="info" color="customGreen" text class="mt-4 mb-4">
       <strong>Note:</strong> Only guards registered in the organization or school can sign in.
       Students should go to the
