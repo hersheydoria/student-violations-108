@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { supabase } from './supabase'
 import axios from 'axios'
 
@@ -177,6 +177,16 @@ export function useStudentRecords() {
       noRecordMessage.value = ''
     }
   })
+
+  // Keydown event listener for Enter key
+  onMounted(() => {
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        handleEnterClick() // Call the search function on Enter key press
+      }
+    })
+  })
+
   const toggleViewHistory = () => {
     showHistory.value = !showHistory.value
   }
@@ -187,7 +197,7 @@ export function useStudentRecords() {
     noRecordMessage,
     historyModalVisible,
     selectedStudent,
-    loading, // Expose loading state,
+    loading, // Expose loading state
     toggleViewHistory,
     handleEnterClick,
     showHistory,

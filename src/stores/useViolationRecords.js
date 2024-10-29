@@ -249,11 +249,28 @@ export function useViolationRecords() {
   const addViolation = async () => {
     await getUser() // Ensure user data is fetched before proceeding
 
-    const studentInfo =
-      selectedMethod.value === 'idNumber'
-        ? newViolation.value.studentId
-        : newViolation.value.studentName
+    let studentInfo // Declare studentInfo to hold the student ID
 
+    // Determine the student information based on the selected method
+    if (selectedMethod.value === 'idNumber') {
+      studentInfo = newViolation.value.studentId // Student ID directly
+    } else if (selectedMethod.value === 'name') {
+      const firstName = newViolation.value.firstName
+      const lastName = newViolation.value.lastName
+
+      // Fetch student by name to get the student ID
+      const student = await getStudentByName(firstName, lastName)
+      if (student) {
+        studentInfo = student.student_number // Assuming student_number holds the ID
+      } else {
+        alert(`Student ${firstName} ${lastName} not found.`)
+        return // Exit if the student is not found
+      }
+    } else {
+      studentInfo = newViolation.value.studentId // For QR code, it uses student_id
+    }
+
+    // Check for required information
     if (!studentInfo || !newViolation.value.type) {
       alert('Please provide both Student Info and Violation Type.')
       return
@@ -300,6 +317,23 @@ export function useViolationRecords() {
       console.error('Error details:', err.response?.data || err.message)
       alert('Failed to save the violation: ' + (err.response?.data.message || err.message))
     }
+  }
+
+  // Function to get a student by first name and last name
+  const getStudentByName = async (firstName, lastName) => {
+    const { data, error } = await supabase
+      .from('students')
+      .select('student_number')
+      .eq('first_name', firstName)
+      .eq('last_name', lastName)
+      .single() // Get a single record
+
+    if (error) {
+      console.error(`Error fetching student data for ${firstName} ${lastName}`, error)
+      return null
+    }
+
+    return data // Should return the student record including student_number
   }
 
   const resetForm = () => {
@@ -401,6 +435,14 @@ export function useViolationRecords() {
     alert('Failed to scan QR code. Please try again.')
   }
 
+  // In your useViolationRecords.js
+  const removeViolation = async (id) => {
+    const { data, error } = await supabase.from('student_violations').delete().eq('id', id)
+
+    if (error) throw error
+    return data
+  }
+
   return {
     showForm,
     showLeftSidebar,
@@ -427,6 +469,7 @@ export function useViolationRecords() {
     showStudentDetails,
     onQrCodeScanned,
     onError,
-    fetchViolations
+    fetchViolations,
+    removeViolation
   }
 }

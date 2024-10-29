@@ -25,17 +25,28 @@ const {
   showStudentInfoModal,
   selectedStudent,
   fetchViolations, // Fetch violations on mount
-  onNameInput,
   showStudentDetails,
   onQrCodeScanned,
   onError,
-  user
+  user,
+  removeViolation
 } = useViolationRecords()
 
 // Fetch violations on component mount
 onMounted(() => {
   fetchViolations()
 })
+
+// Function to remove a violation
+const onRemoveViolation = async (id) => {
+  try {
+    await removeViolation(id) // Call the function to remove from Supabase
+    // Filter out the removed violation from the local state
+    violations.value = violations.value.filter((violation) => violation.id !== id)
+  } catch (error) {
+    console.error('Error removing violation:', error)
+  }
+}
 </script>
 
 <template>
@@ -168,7 +179,10 @@ onMounted(() => {
 
                 <!-- Slot for Action Button -->
                 <template v-slot:item.action="{ item }">
-                  <v-btn @click="unblockViolation(item.id)" color="green">UNBLOCK</v-btn>
+                  <v-btn @click="unblockViolation(item.id)" color="green" style="margin-right: 10px"
+                    >UNBLOCK</v-btn
+                  >
+                  <v-btn @click="onRemoveViolation(item.id)" color="red">REMOVE</v-btn>
                 </template>
               </v-data-table>
             </v-col>
@@ -206,7 +220,6 @@ onMounted(() => {
             </v-card>
           </v-dialog>
 
-          <!-- Add Violation Modal -->
           <v-dialog
             v-model="showForm"
             max-width="600px"
@@ -232,13 +245,19 @@ onMounted(() => {
                     :rules="[(v) => /^[0-9-]+$/.test(v) || 'Only numbers and hyphens are allowed']"
                   ></v-text-field>
 
-                  <v-text-field
-                    v-if="selectedMethod === 'name'"
-                    label="Name"
-                    v-model="newViolation.name"
-                    required
-                    @input="onNameInput"
-                  ></v-text-field>
+                  <div v-if="selectedMethod === 'name'">
+                    <v-text-field
+                      label="First Name"
+                      v-model="newViolation.firstName"
+                      required
+                    ></v-text-field>
+
+                    <v-text-field
+                      label="Last Name"
+                      v-model="newViolation.lastName"
+                      required
+                    ></v-text-field>
+                  </div>
 
                   <v-btn
                     v-if="selectedMethod === 'qrCode'"
@@ -248,6 +267,7 @@ onMounted(() => {
                   >
                     Open QR Code Scanner
                   </v-btn>
+
                   <div v-if="newViolation.studentId" class="mt-2">
                     <p>
                       Scanned Student ID: <strong>{{ newViolation.studentId }}</strong>
