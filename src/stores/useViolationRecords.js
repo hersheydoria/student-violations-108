@@ -29,13 +29,15 @@ export function useViolationRecords() {
   const loading = ref(false)
 
   const headers = [
-    { text: 'Student ID', value: 'studentId' },
-    { text: 'Violation Type', value: 'type' },
-    { text: 'Date', value: 'date' },
-    { text: 'Recorded By', value: 'recordedBy' },
+    { text: 'Student ID', value: 'student_id' },
+    { text: 'Violation Type', value: 'violation_type' },
+    { text: 'Date', value: 'violation_date' },
+    { text: 'Recorded By', value: 'guard_name' },
     { text: 'Status', value: 'status' },
     { text: 'Action', value: 'action', sortable: false }
   ]
+  console.log('Headers: ', headers)
+  console.log('Violations: ', violations)
 
   const violationTypes = [
     'Abuse Code Ceremony',
@@ -443,6 +445,21 @@ export function useViolationRecords() {
     return data
   }
 
+  // Format date function
+  const formatDate = (dateString) => {
+    const date = new Date(dateString)
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true // Use 12-hour format
+    }
+    return date.toLocaleString('en-US', options)
+  }
+
   return {
     showForm,
     showLeftSidebar,
@@ -458,6 +475,7 @@ export function useViolationRecords() {
     headers,
     violationTypes,
     user,
+    formatDate,
     addViolation,
     resetForm,
     unblockViolation,

@@ -29,7 +29,8 @@ const {
   onQrCodeScanned,
   onError,
   user,
-  removeViolation
+  removeViolation,
+  formatDate
 } = useViolationRecords()
 
 // Fetch violations on component mount
@@ -126,14 +127,7 @@ const onRemoveViolation = async (id) => {
           <v-row>
             <v-col cols="12">
               <v-data-table
-                :headers="[
-                  { text: 'Student ID', value: 'student_id' },
-                  { text: 'Violation Type', value: 'violation_type' },
-                  { text: 'Recorded By', value: 'guard_name' },
-                  { text: 'Date', value: 'violation_date' },
-                  { text: 'Status', value: 'status' },
-                  { text: 'Action', value: 'action', sortable: false }
-                ]"
+                :headers="headers"
                 :items="violations"
                 item-value="id"
                 class="mt-5"
@@ -164,12 +158,14 @@ const onRemoveViolation = async (id) => {
 
                 <!-- Guard Name Slot -->
                 <template v-slot:item.guard_name="{ item }">
-                  <span>{{ item.guardFullName || 'No Data' }}</span>
+                  <span>{{
+                    item.guardFullName ? item.guardFullName + ' - Guard' : 'No Data'
+                  }}</span>
                 </template>
 
                 <!-- Date Slot -->
-                <template v-slot:item.violationDate="{ item }">
-                  <span>{{ item.violation_date || 'No Date' }}</span>
+                <template v-slot:item.violation_date="{ item }">
+                  <span>{{ formatDate(item.violation_date) || 'No Date' }}</span>
                 </template>
 
                 <!-- Status Slot -->
@@ -370,5 +366,12 @@ const onRemoveViolation = async (id) => {
   background-color: #286643;
   color: white;
   border: 2px solid #e6ffb1;
+}
+/* Ensure headers are visible */
+.v-data-table-header th {
+  display: table-cell !important;
+  color: #333 !important; /* Change color to be visible */
+  font-weight: bold;
+  background-color: #f5f5f5; /* Light background for contrast */
 }
 </style>

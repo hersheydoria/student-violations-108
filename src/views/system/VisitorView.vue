@@ -91,7 +91,7 @@ const {
 
               <!-- Guard Name Slot -->
               <template v-slot:item.guard_name="{ item }">
-                <span>{{ item.guardFullName || 'No Data' }}</span>
+                <span>{{ item.guardFullName ? item.guardFullName + ' - Guard' : 'No Data' }}</span>
               </template>
 
               <!-- Date Slot -->
@@ -152,7 +152,9 @@ const {
               >
                 <!-- Guard Name Slot -->
                 <template v-slot:item.guard_name="{ item }">
-                  <span>{{ item.guardFullName || 'No Data' }}</span>
+                  <span>{{
+                    item.guardFullName ? item.guardFullName + ' - Guard' : 'No Data'
+                  }}</span>
                 </template>
               </v-data-table>
             </template>
