@@ -1,13 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { createClient } from '@supabase/supabase-js'
-
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
-
-// Initialize Supabase client
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+import { supabase } from '@/stores/supabase'
 
 const route = useRoute()
 const router = useRouter()
