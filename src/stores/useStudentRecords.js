@@ -134,21 +134,33 @@ export function useStudentRecords() {
     }
   }
 
-  // Function to handle ID input when Enter button is clicked
   async function handleEnterClick() {
     if (!studentID.value) {
       noRecordMessage.value = 'Please enter a student ID'
       return
     }
 
-    // Updated regex to allow numeric student IDs with dashes
     if (!/^\d+(-\d+)*$/.test(studentID.value)) {
       noRecordMessage.value = 'Please enter a valid student ID (numbers and dashes allowed)'
       return
     }
 
+    // Fetch student details and set selectedStudent
+    const student = await getStudentByStudentId(studentID.value)
+    if (student) {
+      selectedStudent.value = {
+        fullName: `${student.first_name} ${student.last_name}`,
+        student_number: student.student_number
+      }
+    } else {
+      selectedStudent.value = {
+        fullName: 'Unknown Student'
+      }
+    }
+
     await fetchViolations() // Fetch violations for the entered student ID
   }
+
   function showHistory() {
     selectedStudent.value = {
       fullName: history.value[0]?.studentFullName || 'Unknown Student',

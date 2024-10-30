@@ -83,8 +83,8 @@ const {
                   <v-toolbar-title
                     ><strong>
                       {{
-                        studentID
-                          ? `${selectedStudent?.fullName || 'Unknown Student'}'s RECORD `
+                        selectedStudent?.fullName
+                          ? `${selectedStudent.fullName}'s RECORD`
                           : 'RECORD'
                       }}
                     </strong></v-toolbar-title
