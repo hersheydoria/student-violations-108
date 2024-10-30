@@ -109,10 +109,12 @@ function onForgotPassword() {
 
 // Reset password function
 async function onResetPassword() {
+  errorMessage.value = '' // Clear any previous error messages
+
   if (valid.value) {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(emailForReset.value, {
-        redirectTo: 'https://student-violations.vercel.app/reset-password' // Adjusted for your actual URL
+        redirectTo: 'http://student-violations.vercel.app/reset-password' // Adjust this URL based on your environment
       })
 
       if (error) {
