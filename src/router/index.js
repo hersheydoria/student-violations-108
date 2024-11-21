@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+// Import the shared authState
+import { authState } from '@/main.js'
 
 // Importing the views
 import LoginView from '@/views/auth/LoginView.vue'
@@ -11,29 +13,60 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/login' // Default route redirects to login
+      redirect: '/login'
     },
     {
-      path: '/login', // Login route
+      path: '/login',
       name: 'login',
-      component: LoginView
+      component: LoginView,
+      meta: { requiresAuth: false }
     },
     {
       path: '/reset-password',
       name: 'ResetPassword',
-      component: ResetPasswordView
+      component: ResetPasswordView,
+      meta: { requiresAuth: false }, // Exclude this route from auth checks
+      beforeEnter: (to, from, next) => {
+        console.log('Route object:', to) // Log the route object for debugging
+        console.log('Access token:', to.query.access_token) // Check if the token is extracted
+
+        if (!to.query.access_token) {
+          console.warn('Missing access token. Redirecting to login.')
+          next('/login') // Redirect if no token is provided
+        } else {
+          next() // Allow access
+        }
+      }
     },
     {
-      path: '/visitor', // Visitor view route
+      path: '/visitor',
       name: 'visitor',
       component: VisitorView
     },
     {
-      path: '/home', // Home view (Dashboard) route after login
+      path: '/home',
       name: 'home',
-      component: HomeView
+      component: HomeView,
+      meta: { requiresAuth: true }
     }
   ]
+})
+
+// Global guard for authenticated routes
+router.beforeEach((to, from, next) => {
+  // Skip auth check for routes without auth requirement
+  if (!to.meta.requiresAuth) {
+    next()
+    return
+  }
+
+  // General session-based auth check
+  if (!authState.isAuthenticated) {
+    console.warn('User is not authenticated. Redirecting to login.')
+    next('/login') // Redirect to login if not authenticated
+  } else {
+    next() // Allow access
+  }
 })
 
 export default router
