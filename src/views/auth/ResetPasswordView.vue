@@ -1,6 +1,21 @@
 <script setup>
-import LoginForm from '@/components/auth/LoginForm.vue'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import ResetPasswordForm from '@/components/auth/ResetPasswordForm.vue' // Import the form component
+
+const route = useRoute()
+const accessToken = ref('')
+
+onMounted(() => {
+  // Check if the access token is present in the query parameters
+  if (!route.query.access_token) {
+    accessToken.value = null // Invalid token
+  } else {
+    // Get the access token from the URL query parameters
+    accessToken.value = route.query.access_token
+  }
+})
 </script>
 
 <template>
@@ -21,12 +36,12 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 
             <!-- Card title for "Login" -->
             <v-card-title class="text-center">
-              <h3 class="font-weight-bold" style="color: #286643">Login</h3>
+              <h3 class="font-weight-bold" style="color: #286643">Reset Password</h3>
             </v-card-title>
 
             <!-- Card content -->
             <v-card-text>
-              <LoginForm></LoginForm>
+              <ResetPasswordForm></ResetPasswordForm>
             </v-card-text>
           </v-card>
         </v-col>
@@ -34,3 +49,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
     </AppLayout>
   </v-app>
 </template>
+
+<style>
+/* Add any styles you need */
+</style>
